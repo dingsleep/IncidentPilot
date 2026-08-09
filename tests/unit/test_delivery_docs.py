@@ -72,3 +72,9 @@ def test_ci_workflows_are_read_only_pinned_and_model_free() -> None:
     assert "npm run typecheck" in ci
     assert "workflow_dispatch:" in evaluation
     assert "test_runner_orders_real_fault_episode_and_records_reproducibility" in evaluation
+
+
+def test_windows_only_lock_dependencies_are_platform_guarded() -> None:
+    lock = _read(ROOT / "requirements.lock")
+
+    assert 'pywin32==312 ; sys_platform == "win32"' in lock
