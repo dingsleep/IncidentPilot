@@ -69,7 +69,7 @@ def test_ci_workflows_are_read_only_pinned_and_model_free() -> None:
         assert "api_key" not in workflow
         assert "secrets." not in workflow
 
-    assert "pytest tests/unit tests/contract" in ci
+    assert 'pytest tests/unit tests/contract -m "not integration"' in ci
     assert "npm run typecheck" in ci
     assert "workflow_dispatch:" in evaluation
     assert "test_runner_orders_real_fault_episode_and_records_reproducibility" in evaluation

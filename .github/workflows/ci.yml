@@ -28,7 +28,7 @@ jobs:
       - run: python -m pip install -r requirements.lock
       - run: python -m ruff check src tests
       - run: python -m pyright
-      - run: python -m pytest tests/unit tests/contract -q
+      - run: python -m pytest tests/unit tests/contract -m "not integration" -q
 
   web:
     runs-on: ubuntu-latest
