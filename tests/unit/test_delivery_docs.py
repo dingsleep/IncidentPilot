@@ -65,6 +65,7 @@ def test_ci_workflows_are_read_only_pinned_and_model_free() -> None:
     for workflow in (ci, evaluation):
         assert "permissions:\n  contents: read" in workflow
         assert "actions/checkout@11d5960a326750d5838078e36cf38b85af677262" in workflow
+        assert "pythonpath: src" in workflow
         assert "api_key" not in workflow
         assert "secrets." not in workflow
 
