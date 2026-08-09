@@ -1,98 +1,229 @@
 # IncidentPilot
 
-> 一套可运行、可验证、可审计的 AIOps 多 Agent 事故响应平台。  
-> 它不是聊天机器人，也不是固定答案 Demo：系统会在真实微服务与遥测环境中调查告警、交叉验证根因，并在确定性安全控制下完成人机协同处置。
+> **把一条告警变成“有证据的根因、受控的处置、可验证的恢复”。**
+> IncidentPilot 是我从 0 到 1 实现的 AIOps 多 Agent 事故响应平台：它把专职 Agent 组织成一支 AI 事故响应团队，在真实 OpenTelemetry 微服务环境中完成调查，并把 LLM 放进可审计、可恢复、不能越权的工程闭环，而不是做一个只会回答问题的聊天机器人。
+
+`Python 3.12` · `FastAPI` · `LangGraph` · `MCP` · `PostgreSQL` · `OpenTelemetry` · `Prometheus` · `OpenSearch` · `Jaeger` · `React 19` · `TypeScript` · `Docker Compose`
+
+[![CI](https://github.com/dingsleep/IncidentPilot/actions/workflows/ci.yml/badge.svg)](https://github.com/dingsleep/IncidentPilot/actions/workflows/ci.yml)
+[![Evaluation smoke](https://github.com/dingsleep/IncidentPilot/actions/workflows/evaluation-smoke.yml/badge.svg)](https://github.com/dingsleep/IncidentPilot/actions/workflows/evaluation-smoke.yml)
 
 ![IncidentPilot 真实事故诊断演示](GIF/演示动画.gif)
 
-> 演示内容来自真实后端运行：创建新 Incident、注入公开故障、采集真实遥测、并行调查、形成 Evidence 根因、生成受控建议并进入恢复验证；不是前端预设答案或历史结果回放。
+> GIF 不是预设动画：页面创建新 Incident，后端注入公开故障、采集真实 Metrics / Logs / Traces、运行多 Agent 状态图、持久化 Evidence、执行审批后的受控动作，再用 Prometheus 验证恢复。
 
-## 30 秒了解项目
+## 先看结果
 
-生产事故发生后，工程师通常需要在指标、日志、调用链、变更记录和运行手册之间反复切换。IncidentPilot 将这条排查链路组织成一支有边界的 AI 事故响应团队：
+| 结果 | 实际数据 | 它证明了什么 |
+|---|---:|---|
+| 冻结公开 validation | `3 seeds × 4 cases = 12/12` 完成 | 结果不是只挑一次成功运行 |
+| 诊断质量 | aggregate / 根因 / Evidence 均为 `1.000` | 根因正确且引用的证据真实有效 |
+| 安全结果 | `0` 次 hard failure | 没有未批准写入、越权工具或伪造 Evidence |
+| 真实处置 | 错误率 `0.2581 → 0.0` | 不止生成建议，完成了 rollback 与恢复验证 |
+| 历史单 Agent 基线 | aggregate `0.679` | 保留架构对照，不把旧候选包装成同轮提升 |
+| 冻结阶段工程回归 | Python `307 passed, 1 skipped` | 领域、MCP、编排、审批、恢复和评测都有回归保护 |
+| 公开 Linux CI | Python `248 passed`，Web `19 passed`，真实后端 smoke `1 passed` | 从空 Runner 安装依赖、启动 OTel Demo 并完成 Episode，不依赖作者电脑的既有状态 |
 
-1. 分诊 Agent 理解告警并确定影响范围。
-2. Metrics、Logs、Traces、Runbook Agent 并行调查各自负责的信号。
-3. 事故指挥 Agent 只基于已引用的 Evidence 形成结构化根因结论。
-4. 确定性 Policy Gate 校验动作白名单、风险、权限和证据完整性。
-5. 中高风险操作必须人工批准，再由独立 Action MCP 使用单次授权执行。
-6. Prometheus 在固定窗口内验证恢复；完整轨迹进入审计与受控进化流程。
+> 以上是公开开发集和本地真实环境结果，不是私有 holdout 或生产 SLA。运行 ID、seed、成本和边界可在[评测说明](docs/evaluation.md)中复核。
 
-## 项目亮点
+## 我解决的不是“怎么调用模型”，而是“怎么让模型参与事故响应”
 
-| 能力 | 不是概念，而是实际实现 |
-|---|---|
-| 真实事故环境 | 固定 OpenTelemetry Demo 2.2.0，使用真实微服务、flagd 故障注入和真实 Metrics/Logs/Traces，不用 Mock 遥测冒充端到端结果。 |
-| 有界多 Agent 调查 | 固定状态图、专职无状态 Agent、类型化共享状态、有限重试；不让多个 Agent 自由群聊或无限循环。 |
-| Evidence 驱动诊断 | 根因、影响和建议必须引用持久化 Evidence；Query、时间范围、来源和摘要均可审计。 |
-| 安全处置闭环 | 模型不能决定权限。Policy、审批、签名 grant、scope、nonce、幂等、补偿和恢复验证全部由确定性代码控制。 |
-| 读写工具隔离 | Telemetry MCP 只读；Action MCP 使用独立进程、凭据和权限，仅开放受控的 allowlist 动作，不提供任意 Shell、SQL 或 Docker Socket。 |
-| 受控自进化 | 失败轨迹只能生成候选版本；候选必须经过离线回归、影子评测、确定性门禁和人工批准，不能在线修改自身。 |
-| 可复现工程交付 | Python、TypeScript、PostgreSQL、Docker Compose、OpenTelemetry、MCP、浏览器 E2E、版本化 Prompt/场景/评测报告形成完整工程闭环。 |
+一次生产事故通常需要人在告警、指标、日志、调用链、变更记录和 Runbook 之间来回切换。直接接入一个大模型并不能解决问题：它可能看不到完整信号、引用不存在的证据、输出不稳定，更不能被允许直接操作生产环境。
 
-## 为什么它不是普通的 Agent Demo
+因此我把问题拆成三个工程目标：
 
-- **不是“模型套壳”。** 模型只是调查图中的受限推理节点；事故状态、工具授权、审批、执行、恢复和审计都有独立的工程实现。
-- **不是“多 Agent 表演”。** 每个调查 Agent 只能访问自己的只读工具和最小上下文，所有分支在固定 fan-in 节点收敛，不存在无限讨论。
-- **不是“只给答案”。** 用户能看到哪个 Agent 查了什么、Evidence 从哪里来、多个信号如何指向同一根因，以及建议动作为什么安全。
-- **不是“为了分数调低标准”。** Train/validation 分离，三 seed 固定评测，错误样本推动通用语义修复；失败候选会被确定性门禁拒绝。
-- **不是“让模型接管生产”。** 权限、allowlist、审批、nonce、幂等和恢复判定不交给 LLM；模型即使被提示注入也无法获得任意执行能力。
-- **不是“只做后端代码”。** 项目提供面向普通用户的中文智能诊断、面向技术人员的专业控制台，以及效果验证和系统进化可视化。
+1. **调查可并行，但流程必须有界。** 专职 Agent 各查一种信号，通过固定状态图汇合，不自由群聊、不无限循环。
+2. **结论必须由 Evidence 支撑。** Agent 不能只说“我认为”，每个根因和建议都要引用持久化、可追踪、可校验的遥测证据。
+3. **模型负责判断，代码负责权力。** Policy、审批、授权、幂等、执行、补偿和恢复判定全部由确定性代码控制。
 
-## 系统架构
+## 一次事故是怎么跑通的
 
 ![IncidentPilot 中文系统架构图](docs/assets/incidentpilot-architecture.svg)
 
-架构中最重要的边界是：**Agent 负责调查和生成结构化结论，确定性代码负责权限、安全与状态变更。** 即使模型判断错误，它也无法绕过 Policy Gate、替自己批准、扩大 scope 或重复执行写操作。
+| 阶段 | 我是怎么实现的 | 产生的可审计结果 |
+|---|---|---|
+| 1. 接收告警 | FastAPI 校验 Alertmanager/用户输入，PostgreSQL 事务内创建 Incident 和幂等 Job | Incident ID、告警快照、租户与审计事件 |
+| 2. 进入队列 | 数据库 Job Queue 使用 lease、heartbeat、retry 和 dead-letter，Worker 可从崩溃中恢复 | Job 状态、重试次数、Worker 心跳 |
+| 3. 理解事故 | Triage Agent 将告警转为类型化范围：服务、时间窗、严重度、调查预算 | 结构化 `InvestigationPlan` |
+| 4. 并行调查 | LangGraph fan-out 到 Metrics / Logs / Traces / Runbook Agent；每个 Agent 只拿到最小上下文和自己的只读 MCP Tool | ToolCall、查询模板、Evidence ID、摘要与 digest |
+| 5. 交叉验证 | Commander 在固定 fan-in 节点综合信号；Pydantic Schema、引用校验和受限终局器保证输出可消费 | 根因服务、故障类别、影响、置信度和引用列表 |
+| 6. 规划处置 | Remediation Planner 只能从 allowlist 生成候选动作，Policy Gate 确定性检查证据、风险、权限和作用域 | Proposal、风险、目标、验证方式、拒绝原因 |
+| 7. 执行动作 | 低风险动作可按客户策略自动批准；中高风险等待人工批准。Action MCP 校验 Ed25519 grant、scope、nonce 和幂等键后单次执行 | Approval、ActionAttempt、幂等结果和补偿状态 |
+| 8. 验证恢复 | Prometheus 按固定 60 秒观察窗与 15 秒轮询验证 SLO；失败时不伪装成功，而是进入补偿或人工处理 | baseline、恢复指标、最终状态和完整审计链 |
+| 9. 受控进化 | 失败轨迹被聚类并生成 Prompt candidate；训练、validation、shadow 与 Promotion Gate 决定是否晋级 | candidate diff、分项分数、拒绝原因、Active 版本 |
 
-## 关键难题与工程优化
+这条链路的关键不是 Agent 数量，而是每一步都有明确输入、输出、权限边界和失败状态。Worker 中断后能从 PostgreSQL checkpoint 恢复；浏览器通过可续传 SSE 看到的也是这条真实运行轨迹。
 
-| 真实遇到的问题 | 根因定位 | 最终解决方式 | 工程价值 |
+### 这些数据到底有多“真实”
+
+这里的“真实”有明确边界：**它不是生产公司的私有事故数据，而是实际运行的 OpenTelemetry Demo 微服务和负载产生的运行时遥测；不是前端 Mock、固定 JSON 或离线拼接答案。**
+
+- Docker Compose 真正启动 checkout、payment、product-catalog、recommendation 等微服务，不是用一份 JSON 假装服务存在。
+- Load Generator 真正发送请求，flagd 真正改变服务行为；故障发生前后的成功率、延迟、错误日志和 Span 会随运行变化。
+- OpenTelemetry Collector 把信号实际送入 Prometheus、OpenSearch 和 Jaeger；Agent 通过 MCP 调用这些后端，不读取前端写死的答案。
+- 每次 Query、ToolCall 和 Evidence 都会写入 PostgreSQL；页面显示的是当前 Incident 的 SSE/API 数据，而不是回放一份“必然成功”的历史结果。
+- 批准 rollback 后，Action MCP 真正恢复故障开关；Verifier 再读取新的 Prometheus 时间窗判断是否恢复，而不是点击按钮后直接把状态改成“成功”。
+- Mock 只用于单元测试，不会被统计成端到端效果；Evaluation Runner 才能看到故障标准答案，在线 Agent 无法访问。
+
+因此它仍然是本地参考环境，不等于已经接入真实生产集群；但调查、工具调用、状态变化、故障处置和遥测反馈都真实发生，工程链路不是概念演示。
+
+## 多 Agent 是怎么协作的
+
+```text
+告警 → Triage
+          │
+          ├── Metrics Agent ── Prometheus 模板化查询 ─┐
+          ├── Logs Agent ───── OpenSearch 有界检索 ──┤
+          ├── Traces Agent ─── Jaeger 时间窗追踪 ────┼→ Commander → Diagnosis
+          └── Runbook Agent ── PostgreSQL FTS/RRF ───┘
+                                                     │
+                    Deterministic Policy Gate ← Remediation Planner
+                              │
+                     Approval / Auto-approve policy
+                              │
+                     Action MCP → Verify → Review
+```
+
+| 角色 | 只能看到什么 | 只能做什么 | 为什么这样拆 |
 |---|---|---|---|
-| 多 Agent 曾把缓存故障误归因到下游服务 | 日志采样被高吞吐 INFO 挤占；cache hit/miss 与下游 `not_found` 的语义优先级不清晰 | 改为按服务公平采样；只有日志与已选 Trace 共享 trace ID 时才绑定；建立版本化 taxonomy 与独立训练/验证样本 | 修复的是通用证据语义，不是针对单个 validation case 写规则 |
-| 模型输出偶发缺字段或结构不稳定 | Tool Strategy 与模型能力不匹配，Commander 可能遗漏合法 Diagnosis | 固定可复现的 `json_output` 策略、版本化 Prompt/Profile；增加只封装模型已有高置信假设的受限确定性终局器 | 不降低质量阈值，也不让代码凭空推断根因 |
-| 恢复动作成功，但短窗口指标仍可能误判失败 | PromQL 使用 1 分钟 rate，验证器却过早读取 | 将 proposal baseline、60 秒观察窗和 15 秒轮询语义对齐，验证失败进入补偿或人工处理 | 从“动作执行成功”提升到“真实 SLO 已恢复” |
-| 审批页曾出现“无可执行动作”并卡住下一次诊断 | Proposal ID 被共享脱敏规则误判为支付卡号；等待审批 Incident 同时持有环境锁 | 修正脱敏边界；新增租户隔离的 current Proposal API；排队状态显式展示阻塞事故 | 解决了安全、可用性和并发状态一致性之间的真实工程冲突 |
-| 自进化候选在训练集提升、验证集却退化 | Prompt candidate 对局部样本过拟合，根因准确率从 `1.000` 降至 `0.750` | Promotion Gate 按根因、安全、成本和多 seed 规则拒绝候选，Active Prompt 保持不变 | 证明“拒绝”也是进化系统的正确结果，不为展示而强行上线 |
-| 第一版前端信息密、字号小、技术人员之外难以理解 | 直接把内部对象和参数堆到页面，缺少用户任务主线 | 重构为明亮中文单屏指挥台：左侧实时展示 Agent 协作，右侧固定展示根因、Evidence、动作、审批和恢复；专业细节进入抽屉 | 将复杂 Agent 系统翻译成 HR、普通客户和 SRE 都能理解的产品体验 |
+| Triage | 告警与服务目录 | 确定范围和调查预算 | 防止所有 Agent 重复理解原始告警 |
+| Metrics Agent | 指标模板与时间窗 | 查询 Prometheus | 不允许模型生成任意 PromQL |
+| Logs Agent | 日志模板与服务范围 | 查询 OpenSearch | 控制通配符、条数、时间和响应大小 |
+| Traces Agent | Trace 查询与依赖关系 | 查询 Jaeger | 只接受与事故时间窗、服务和操作相关的 Span |
+| Runbook Agent | 版本化运维手册 | FTS / pgvector + RRF 检索 | 把组织知识作为可引用材料，而不是塞进长 Prompt |
+| Commander | 已持久化 Evidence 摘要 | 形成结构化 Diagnosis | 不能直接查工具，避免在综合阶段改变证据集合 |
+| Planner / Verify | Diagnosis、Policy 结果、恢复指标 | 生成候选动作 / 判定恢复 | Agent 生成建议；真正授权与判定仍由代码完成 |
 
-这些优化均保留失败记录、版本号和回归证据；没有通过删除样本、修改冻结 validation 或放宽安全规则制造“成功”。
+所有 Agent 都是无状态专职节点，共享的是类型化 JSON State，不是私有思维链。图有最大步数、工具预算、上下文预算和有限重试；同一 Evidence 通过 canonical digest 去重，所有分支最终在固定节点收敛。
 
-## 真实评测与运行证据
+一些不显眼、但决定系统能否落地的设计：
 
-| 验证项 | 当前证据 |
-|---|---|
-| 公开 validation | 冻结候选在 seeds 64 / 71 / 79 上均完成 4/4 场景，共 12 次独立场景运行。 |
-| 诊断质量 | 三个 seed 的 aggregate / 根因准确率 / Evidence 有效性均为 `1.000 / 1.000 / 1.000`。 |
-| 安全结果 | 三个 seed 的安全硬失败均为 `0`；所有公开故障开关最终恢复为 `off`。 |
-| 公平基线 | 归档的单 Agent 公平 baseline aggregate 为 `0.679`；它属于更早候选，仅作为架构对照，不伪装成 v15 的同轮提升比例。 |
-| 真实处置闭环 | 浏览器实际完成 flagd 故障、四路调查、人工批准、Action MCP 单次 rollback 和 Prometheus 恢复验证；错误率由 `0.2581` 降至 `0.0`。 |
-| 工程回归 | 冻结阶段全量 Python 回归 `307 passed, 1 skipped`；前端 TypeScript、ESLint、Vitest、production build 与 Playwright 均通过。 |
+- **最小上下文：** 每个 Agent 只接收告警摘要、自己的服务/时间范围和必要 Evidence，避免把全部 Incident 塞给所有模型调用。
+- **最小工具面：** Metrics Agent 看不到日志工具，Logs Agent 看不到 Trace 工具；Commander 甚至不能临时追加查询，只能综合已经固化的证据。
+- **不可变合并：** 并行分支通过 typed reducer 合并，禁止某个 Agent 覆盖其他分支或改写已持久化 Evidence。
+- **模板化查询：** PromQL、日志检索和 Trace 请求由服务端 Query Registry 生成，限制时间窗、通配符、返回条数和响应大小。
+- **失败也是类型化结果：** 参数错误、上游超时、权限不足和结果截断都会形成 ToolCall 状态，不会被吞掉后让模型误以为“没有异常”。
+- **可恢复人工暂停：** 图在等待审批前写 checkpoint；即使 API 或 Worker 重启，也能从批准节点继续，而不是重新执行调查和动作。
+- **不持久化思维链：** 只保存结构化结论、证据引用、工具调用和状态变化，既可审计，也避免把模型私有推理当作业务事实。
 
-这些数字来自公开 train/validation 和真实本地运行记录，不是私有 holdout 结论。完整运行 ID、成本、失败历史和限制见 [评测说明](docs/evaluation.md) 与 [最终评测报告](docs/reports/final-evaluation.md)。
+## 技术栈不是堆名词：每一层都对应一个问题
 
-## 前端产品体验
+| 层 | 技术 | 在项目中的职责 |
+|---|---|---|
+| 前端 | React 19、TypeScript、Vite、TanStack Query、ECharts | 中文单屏事故指挥台、SSE 实时协作、拓扑与 Evidence、审批/恢复/进化可视化 |
+| API | FastAPI、Pydantic、OpenAPI | 告警接入、Incident/Evidence/Approval/Evaluation API、Problem Details、租户边界 |
+| 编排 | LangGraph、PostgreSQL Checkpoint | 有界 fan-out/fan-in、多 Agent 状态机、崩溃续跑、JSON 状态持久化 |
+| 模型层 | Qwen / DeepSeek OpenAI-compatible Gateway、结构化输出 | 版本化 Profile、Prompt、temperature、token budget、重试与 ModelCall 成本记录 |
+| 工具层 | Model Context Protocol（MCP） | Telemetry MCP 与 Action MCP 进程、凭据和权限完全分离 |
+| 数据层 | PostgreSQL、SQLAlchemy 2、Alembic、pgvector | Incident、Evidence、ToolCall、Job、Audit、Prompt candidate、评测结果与 Runbook 检索 |
+| 遥测层 | OpenTelemetry Demo 2.2.0、Prometheus、OpenSearch、Jaeger | 真实微服务故障、指标、日志、调用链和恢复事实 |
+| 安全层 | Ed25519 JWT/grant、AES-GCM、nonce、scope、RBAC | 最小授权、单次批准、私有映射加密、重放防护与跨租户隔离 |
+| 质量层 | Pytest、Ruff、Pyright、Vitest、ESLint、Playwright | 单元、契约、真实后端、浏览器 E2E、静态检查和可复现评测 |
+| 交付层 | Docker Compose、只读非 root 容器、GitHub Actions | 本地一键复现、运行时隔离、固定 Action SHA 和无模型密钥 CI |
+
+## 项目亮点与核心设计判断
+
+### 1. Evidence-bound，而不是让模型“讲得像真的”
+
+Telemetry MCP 不返回一段随意文本，而是把来源、Query、时间窗、摘要、digest 和租户写入 Evidence Store。Diagnosis 创建前会校验 Evidence 是否存在、是否属于当前 Incident、是否支持对应 claim。这样可以区分“模型表达正确”和“结论事实上有依据”。
+
+### 2. 读写 MCP 物理隔离，而不是靠 Prompt 提醒安全
+
+调查 Agent 只连接 Telemetry MCP；Action MCP 是独立进程、独立凭据和独立网络边界，只提供 allowlist 动作。模型拿不到任意 Shell、SQL、Docker Socket、`kubectl exec` 或任意 URL。即使提示注入成功，也无法把只读调查权限升级成写权限。
+
+### 3. 确定性安全门，而不是让另一个 Agent 审核 Agent
+
+Policy Gate 不是 LLM。它用代码检查动作白名单、Evidence 前置条件、风险级别、租户、scope、签名 grant、nonce、幂等和审批模式。这样模型错误不会直接变成权限错误，重复请求也不会重复执行写操作。
+
+### 4. 可失败的受控自进化，而不是在线修改自己
+
+系统会从低分 Episode 中聚类失败、生成 Prompt diff，但 candidate 无权激活自己。它必须依次经过训练集、独立 validation、多 seed、成本、安全和 shadow gate；任何关键指标回退都保持当前 Active 版本。
+
+### 5. 隐藏答案与在线 Agent 隔离
+
+故障注入器和标准答案只属于 Evaluation Runner。日常 Agent、API、Worker 和候选生成器无法读取 hidden truth；私有 holdout 只有候选冻结且用户明确授权后才能由隔离 Runner 解密。这避免了“评测系统把答案泄露给被测系统”。
+
+## 关键难题与工程优化：我是如何把失败变成系统能力的
+
+### 难题一：模型能返回 JSON，不代表能诊断正确
+
+- **现象：** 早期 DeepSeek Tool Strategy 出现工具参数和 Schema 不稳定；Flash 仅完成 `2/3` Episode，Pro 虽完成 `3/3`，首轮 Schema 有效率仍只有 `50%`。
+- **实验：** 改用可复现的 JSON Output 后，Flash 达到 `3/3` Episode、`12/12` 首轮 Schema 合法，成本下降 `45.6%`，模型延迟下降 `46.8%`。
+- **没有自欺：** 根因准确率仍为 `0`，所以我没有宣布模型优化成功。这说明格式问题已解决，但证据语义和综合逻辑仍有缺陷。
+- **最终方案：** 将输出格式、Prompt、模型 Profile、查询模板和 taxonomy 分开版本化；受限确定性终局器只能封装模型已有的高置信假设，不能凭空补根因。
+
+### 难题二：多源遥测会互相“作伪证”
+
+- **现象：** cache 故障曾被误归因到下游 `product-catalog`；高吞吐 INFO 日志挤掉关键服务信号，历史成功日志又错误反驳了当前错误 Trace。
+- **定位：** 问题不在“模型不够聪明”，而在采样公平性、时间对齐、服务/操作对齐和 trace correlation 规则不严格。
+- **最终方案：** 日志按服务公平采样；日志只有与已选 Trace 共享 trace ID 才绑定；成功信号必须同时匹配服务、操作、时间和 Trace 上下文才可作为反证；依赖不可达优先于泛化根服务标记。
+- **工程价值：** 修复的是通用 Evidence 语义，并用独立 taxonomy train/validation 样本验证，不针对某一个 validation case 写答案。
+
+### 难题三：动作执行成功，不等于事故已经恢复
+
+- **现象：** flagd rollback 已成功，但验证器立即读取 `[1m] rate`，旧故障样本尚未移出窗口，系统会误判恢复失败。
+- **最终方案：** Proposal 记录 baseline，验证采用固定 `60s` 观察窗和 `15s` 轮询；重试只推进时间，不偷偷扩大 PromQL 窗口。验证失败进入补偿或人工处理，不能把 HTTP 200 当恢复完成。
+- **结果：** 实际浏览器链路中错误率从 `0.2581` 降到 `0.0`，故障 flag 最终恢复为 `off`。
+
+### 难题四：安全组件也可能破坏可用性
+
+- **现象：** 审批页出现“无可执行动作”，新诊断又长时间卡在“准备环境”。
+- **定位：** Proposal ID 被通用脱敏器误判为卡号；同时等待审批的 Incident 持有全局故障环境锁。
+- **最终方案：** 收紧脱敏规则的语义边界；增加租户隔离的 current Proposal API；排队状态显式显示阻塞 Incident；审批完成后释放环境并继续队列。
+- **工程价值：** 不是关闭脱敏或移除锁，而是同时保住安全、并发一致性和用户可理解性。
+
+### 难题五：训练集更高，也可能不应该发布
+
+- **现象：** candidate `candidate-f871693e17e3` 的 train aggregate 从 `0.9625` 升到 `1.0000`，但 validation aggregate 从 `1.0000` 降到 `0.9125`，根因准确率从 `1.0000` 降到 `0.7500`。
+- **处理：** Promotion Gate 写入 `shadow_rejected`，Active Prompt 保持不变，也没有运行私有 holdout。
+- **工程价值：** “拒绝一次看似变好的优化”证明自进化系统真的受质量门控制，而不是为了演示永远显示升级成功。
+
+## 真实评测：数据如何产生
+
+Episode Runner 执行固定顺序：
+
+```text
+preflight → snapshot → baseline → inject → warmup → alert
+→ agent → deterministic score → cleanup → recovery check
+```
+
+每次运行记录 Demo、Prompt、模型、Tool、seed 和环境 digest；故障注入全局串行，恢复不健康会阻断后续 suite。Scorer 直接比较结构化 Diagnosis、数据库事实和 Evidence digest；LLM Judge 只能评价表达，不能决定根因、安全、权限或恢复。
+
+| Suite seed | Cases | Aggregate | Root | Evidence | Hard failures | 模型成本 | 时长 |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 64 | 4/4 | `1.000` | `1.000` | `1.000` | 0 | 2758 µUSD | 112.5 s |
+| 71 | 4/4 | `1.000` | `1.000` | `1.000` | 0 | 2680 µUSD | 106.4 s |
+| 79 | 4/4 | `1.000` | `1.000` | `1.000` | 0 | 3011 µUSD | 123.5 s |
+
+三个 seed 的 mean 与 worst-seed aggregate / root / Evidence 都是 `1.000`，总模型成本 `8449 µUSD`，安全硬失败 `0`。所有 15 个公开评测故障开关在最终运行后都确认恢复为 `off`。
+
+性能基线同样拆开报告，避免把脚本 Agent 的速度冒充真实 LLM 延迟：API p95 `84.5 ms`、SSE 首事件 `17.2 ms`、Telemetry MCP p95 `347.4 ms`、Job wait p95 `108.1 ms`、真实 OTel + PostgreSQL + Queue + Checkpoint 的脚本图 E2E 为 `7000 ms`。
+
+## 前端产品体验：把复杂系统翻译给用户
 
 ![IncidentPilot 单屏事故指挥台](artifacts/ui/persona-review-v2/12-incident-final-readable.png)
 
-- **智能诊断：** 粘贴告警、选择服务、上传文本，或直接体验一次真实案例。
-- **AI 团队协作：** 运行节点、并行连线、进度和结果全部来自当前 Incident 的 API/SSE 状态，不是前端倒计时动画。
-- **事故记录：** 快速查看根因、影响、Evidence、处置与恢复；历史等待审批会明确标记“待人工复核”。
-- **专业控制台：** 展开 Query、Evidence ID、状态图、审批、审计事件、Prompt 与运行元数据。
-- **效果验证：** 直接展示三 seed、12 个独立场景、分项指标、成本和公平 baseline。
-- **系统进化：** 展示真实候选 Diff、训练/验证差异、七项门禁以及候选为什么被拒绝。
+前端不是单独做的“展示壳”，而是消费真实 API/SSE 状态的交付层：
 
-## 用户如何使用
+- **普通用户**可以粘贴告警、选择服务、上传文本或启动真实案例；左侧看到 AI 团队当前工作和信号流转，右侧始终看到根因、Evidence、建议动作、审批与恢复。
+- **技术人员**可以展开 Query、Evidence ID、状态图、模型/Profile/Prompt 版本、ToolCall、审批 grant、审计事件和恢复指标。
+- **管理者或面试官**可以在“效果验证”查看三 seed、12 个 Episode、分项指标、成本和历史 baseline，在“系统进化”查看真实 candidate diff 及拒绝原因。
+- **交互不是倒计时模拟。** 节点运行、连线点亮、排队、待审批、执行和验证都来自当前 Incident 的后端状态；Agent 完成后窗口停留在它的结构化结论。
 
-- **没有现成告警：** 选择一个公开真实案例，点击“启动真实案例”，观察 AI 团队逐步调查。
-- **已有告警：** 粘贴告警、选择服务或上传文本文件，系统创建新的 Incident 并进入同一调查流程。
-- **只想调查：** 选择“仅诊断”，系统只读取遥测并给出 Evidence-bound 结论。
-- **需要处置：** 选择人工审批模式；符合 allowlist 的建议会展示风险、目标和验证方式，批准后才执行。
-- **需要技术深挖：** 打开“专业详情”，查看 Query、Evidence ID、状态图、审批、审计事件和恢复记录。
+第一版前端曾经信息密、字号小、流程不突出。我根据普通用户、HR、技术面试官和 SRE 四类视角重构为明亮中文单屏指挥台：核心结论固定在首屏，专业细节按需展开，既不隐藏多 Agent，也不把内部 JSON 强塞给普通用户。
 
-## 最短运行方式
+## 这个项目体现的能力
 
-环境要求：Docker Desktop + Compose、Node.js 22、Python 3.12。模型 Key 只放在被 Git 忽略的本地 `.env`。
+- **AI 工程：** 不是只调 Prompt，而是完成模型基线、结构化输出、Evidence grounding、taxonomy、上下文预算、多 seed 评测和失败归因。
+- **后端与分布式系统：** 事务内建单、幂等队列、lease/heartbeat、checkpoint 恢复、SSE 续传、append-only audit hash chain 和服务权限拆分。
+- **安全工程：** 把“模型判断”与“执行权限”分离，实现签名批准、scope、nonce、幂等、allowlist、读写 MCP 隔离和恢复补偿。
+- **数据与质量意识：** 保存失败结果，不删样本、不降阈值；用 train/validation/seed/scorer 和拒绝门禁证明改动是否真的泛化。
+- **产品化能力：** 把后台状态图、Evidence、审批、恢复和自进化翻译为普通用户能操作、技术人员能深挖的中文界面。
+- **完整交付：** 从 Docker/WSL 环境、真实遥测、后端、前端、E2E、性能基线到公开 GitHub 和演示材料形成闭环。
+
+## 如何运行
+
+环境要求：Docker Desktop + Compose、Node.js 22、Python 3.12。模型 Key 只放在 Git 忽略的本地 `.env`，不会进入浏览器或 GitHub Actions。
 
 ```powershell
 D:\software\ana\envs\tx_agent\python.exe scripts\configure_local_security.py
@@ -100,32 +231,24 @@ D:\software\ana\envs\tx_agent\python.exe scripts\configure_local_security.py
 .\scripts\start_dev.ps1 -ApiHostPort 8201 -WebHostPort 5180
 ```
 
-启动后访问 `http://127.0.0.1:5180`。只读模式、健康检查和停止方式见 [真实演示录制脚本](docs/demo-script.md)。
+访问 `http://127.0.0.1:5180`。完整启动、只读模式、健康检查和停止方式见[真实演示脚本](docs/demo-script.md)。
 
-## 这个项目体现的工程能力
+## 边界与诚实声明
 
-- 能把 LLM 能力放进受约束、可恢复、可审计的生产式工作流，而不是只做 Prompt 调用。
-- 能设计多 Agent 的职责边界、状态收敛、工具最小授权和上下文预算。
-- 能将模型质量转化为可重复的 train / validation / seed / scorer 工程，而不是凭主观观感判断效果。
-- 能实现从告警、调查、根因、审批、执行、验证到复盘和受控进化的完整闭环。
-- 能诚实区分本地参考实现、公开评测和真实生产部署，不用未经验证的“企业级”措辞包装项目。
-
-## 安全边界与已知限制
-
-- 当前是可复现的本地参考实现，不宣称已经在真实生产集群或大规模多租户环境运行。
-- 私有冻结 holdout 未提供、未读取、未运行；公开页面不会把 validation 结果冒充私有发布结论。
-- Action MCP 只在本地完整体验中启用，绑定 loopback/Compose 内网，不向公网开放写权限。
-- M10 的 SFT/GRPO 需要至少 300 个 Episode、1000 条优质轨迹和独立 GPU/预算；当前不为追求标签而伪造后训练结论。
+- 当前是可复现的本地工程参考实现，不宣称已经在真实生产集群或大规模多租户环境运行。
+- 私有冻结 holdout 未提供、未读取、未运行；公开 validation 结果不能冒充最终发布结论。
+- Action MCP 仅在本地完整体验中启用，绑定 loopback / Compose 内网，不向公网暴露写权限。
+- M10 的 SFT / GRPO 需要至少 300 个 Episode、1000 条优质轨迹和独立 GPU/预算；当前没有为了增加标签而伪造后训练成果。
 
 ## 深入阅读
 
 - [系统架构与边界](docs/architecture.md)
-- [评测方法与真实结果](docs/evaluation.md)
+- [评测方法、运行 ID 与失败历史](docs/evaluation.md)
 - [安全设计](docs/security.md)
-- [真实演示录制脚本](docs/demo-script.md)
+- [真实演示脚本](docs/demo-script.md)
 - [最终评测报告](docs/reports/final-evaluation.md)
 - [已知限制](docs/reports/known-limitations.md)
-- [完整实施与验收记录](IMPLEMENTATION_MASTER.md)
+- [M0–M11 完整实施与验收记录](IMPLEMENTATION_MASTER.md)
 
 <details>
 <summary>历史英文工程记录（默认折叠）</summary>

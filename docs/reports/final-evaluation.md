@@ -1,6 +1,6 @@
 # Final evaluation status
 
-Date: 2026-08-08  
+Date: 2026-08-09
 Scope: frozen public validation, local engineering regression, and explicit release boundaries
 
 ## Result
@@ -106,12 +106,34 @@ image also completed its no-model `--help` probe. All public fault flags were
 `off`, and the browser loaded the four product routes without console, page, or
 HTTP errors. This verifies startup and isolation, not a private-holdout result.
 
+## Public delivery verification (2026-08-09)
+
+The public repository is available at
+<https://github.com/dingsleep/IncidentPilot>. Its default Chinese README now
+explains the end-to-end implementation, bounded multi-agent design, technology
+choices, preserved failures, quantitative results, product UI, and explicit
+production/holdout boundaries. The real browser recording is published as
+`GIF/演示动画.gif` (`1890×927`, `102.59s`, `17.46MB`); sampled frames and the
+public candidate scan found no API key, token, `.env`, or local private path.
+
+GitHub Actions completed successfully on a fresh Linux runner:
+
+| Workflow | Run | Actual result |
+|---|---|---|
+| CI | [`31300740055`](https://github.com/dingsleep/IncidentPilot/actions/runs/31300740055) | Ruff passed; Pyright reported 0 errors; Python `248 passed, 1 skipped, 1 deselected`; Web typecheck/lint passed and Vitest reported `10 files / 19 tests` |
+| Evaluation smoke | [`31300633601`](https://github.com/dingsleep/IncidentPilot/actions/runs/31300633601) | Verified pinned OpenTelemetry Demo `2.2.0`, started the real telemetry backends healthy, and completed the scripted real-backend Episode test (`1 passed`) |
+
+The first public runs exposed two Windows-to-Linux delivery defects: an
+unguarded `pywin32` lock entry and a missing `src` import path. A third run
+showed an integration-marked PostgreSQL test mixed into the infrastructure-free
+fast CI scope. The fixes added a platform marker, an explicit `PYTHONPATH`, and
+separated fast contract tests from real-backend smoke. No test, sample, quality
+threshold, or security rule was removed to obtain a green result.
+
 ## Deliberately uncompleted gates
 
 - Private holdout three-seed evaluation was not performed. Public validation
   passed, but the required private package is unavailable and a holdout run
   requires a separate explicit user task.
-- A real public demo GIF/video has not been recorded; no synthetic substitute is
-  represented as evidence.
-- CI workflows were not created because they require separate user
-  authorization under the repository rules.
+- No internet-facing production deployment has been made. The local Action MCP
+  remains restricted to loopback/Compose networks and is not exposed publicly.

@@ -2706,17 +2706,17 @@ Pop-Location
 - 在用户明确批准后创建：`.github/workflows/ci.yml`
 - 在用户明确批准后创建：`.github/workflows/evaluation-smoke.yml`
 
-- [ ] PR CI 运行 lint、typecheck、unit 和 MCP contract，不调用收费模型、不启动完整 OTel Demo。
-- [ ] Evaluation smoke 使用 scripted model + 一个轻量真实后端场景，所有 Secret 由 GitHub Environment 管理。
+- [x] PR CI 运行 lint、typecheck、unit 和 MCP contract，不调用收费模型、不启动完整 OTel Demo。
+- [x] Evaluation smoke 使用 scripted model + 一个轻量真实后端场景，所有 Secret 由 GitHub Environment 管理。
 - [ ] 完整收费/耗时评测只允许手动触发，设置 concurrency、防重复和费用上限。
 - [x] Workflow 权限默认 read-only，第三方 Action 固定 commit SHA。
 
 #### 任务 M11.5：公开演示边界
 
-- [ ] GitHub 仓库提供本地运行说明、GIF/视频和冻结评测产物。
+- [x] GitHub 仓库提供本地运行说明、GIF/视频和冻结评测产物。
 - [ ] 如部署在线 Demo，只开放只读预录/沙箱 Incident；Action MCP 和目标控制凭据不暴露公网。
-- [ ] 不把 API Key 放前端，不在截图/GIF 中出现 `.env`、Token 或本机隐私路径。
-- [ ] 简历只使用 final report 中真实数字，不能写未经测量的“提升 xx%”。
+- [x] 不把 API Key 放前端，不在截图/GIF 中出现 `.env`、Token 或本机隐私路径。
+- [x] 简历只使用 final report 中真实数字，不能写未经测量的“提升 xx%”。
 
 **M11 验收：** 新机器按 README 可以启动核心流程；所有必需测试通过；最终指标和限制透明；公开面不含写权限或密钥。
 
@@ -2758,7 +2758,7 @@ flowchart LR
 
 ## 26. 当前实施状态
 
-> **2026-08-09 状态覆盖：** M0-M9 已完成，M10 是未启动的可选后训练阶段，当前阶段为 M11 收尾。公开 validation 的冻结候选为 `p1-4d19782f3126:qwen3.7-flash:json_output:q-f4a05b7141c0:t-telemetry-v9:s-v15-a1-t8-m1`；`validation-v2-score-v5` seeds 64/71/79 均为 aggregate/root/Evidence=`1.0/1.0/1.0`、安全硬失败=`0`。用户已确认当前前端体验没有问题；`core/actions/evaluation` 已从干净进程复验，公开候选文件 Secret 扫描无命中。剩余交付项是：由用户录制真实演示；CI 仍需单独授权；仅在用户明确发起且私有包可用时运行可选的冻结 holdout。下方以“当前已完成 M0-M8”开头的长段保留为 2026-07-30 历史快照，不再代表当前阶段。
+> **2026-08-09 状态覆盖：** M0-M9 已完成，M10 是数据与算力条件未满足的可选后训练阶段，M11 公开交付已完成。公开 validation 的冻结候选为 `p1-4d19782f3126:qwen3.7-flash:json_output:q-f4a05b7141c0:t-telemetry-v9:s-v15-a1-t8-m1`；`validation-v2-score-v5` seeds 64/71/79 均为 aggregate/root/Evidence=`1.0/1.0/1.0`、安全硬失败=`0`。公开仓库 `https://github.com/dingsleep/IncidentPilot` 已包含中文求职主页、真实运行 GIF、中文架构图、冻结评测与限制；GitHub CI run `31300740055` 和真实 OTel scripted smoke run `31300633601` 均通过，公开文件 Secret 扫描无命中。仅在用户明确发起且私有包可用时运行可选冻结 holdout；当前结果不宣称生产部署或私有 holdout。下方以“当前已完成 M0-M8”开头的长段保留为 2026-07-30 历史快照，不再代表当前阶段。
 
 状态只能在验证命令实际通过后更新。当前已完成 M0-M8 与 M9.1-M9.2，下一最小闭环为 M9.3。M6 最终候选固定为 `p1-9030b15a9d6b:qwen3.7-flash:json_output:q-2f310decbea1:t-telemetry-v9:s-v8-tax4`：完整公开 train `eval-multi-20260730015313-41` 与完整公开 validation `eval-multi-20260730021852-41` 均为 4/4、aggregate/root/Evidence=`1.0/1.0/1.0`、安全硬失败=`0`。同候选、同 seed、同公开 validation 的 baseline `eval-baseline-20260730023140-41` aggregate=`0.679`，证明 multi 在相同真实故障和遥测条件下有可衡量提升。M6 期间修复了三项确定性证据语义：按服务公平采样日志、cache hit/miss 归属优先于下游 `not_found`、仅在日志与已选 trace 共享 trace ID 时绑定日志证据。一次中断的外部模型进程遗留 flagd 变体后，已将受影响 flag 恢复为 `off`、排空两分钟指标窗口、用无模型 recovery 探针确认干净基线，再生成最终 validation；所有公开评测 flag 当前均为 `off`。M7 已实现确定性 Policy、Ed25519 单次 approval grant、持久 checkpoint 的 API/Worker resume、执行前 Authorization Gate 和数据库 nonce 消费。M7.5 将 proposal baseline 由真实 Prometheus 采集；`service_error_ratio` 的固定 60 秒观察期与模板的 1 分钟 `rate` 语义一致。完整 E2E 以 API 签发的 grant 恢复同一 Worker checkpoint，经过 Authorization Gate、Action handler/store、真实本地 flagd 回滚和真实 Prometheus SLO 验证，持久化 `RESOLVED` 与 verification result；无效 restart 则记录失败并进入 `NEEDS_HUMAN`。Action MCP 仍默认关闭，测试仅通过受控进程内 transport 复用其已验证 grant、handler 与 store，不启用常驻写服务；Docker adapter 未重启真实容器。私有 holdout 仍必须由用户明确发起。
 
@@ -2777,7 +2777,7 @@ flowchart LR
 | M8 可观测与安全 | 已完成 | 2026-08-01：OTel spans/metrics、Grafana dashboard、脱敏属性测试、本地 collector smoke、安全/韧性门禁与性能基线通过 |
 | M9 受控自进化 | 拒绝路径完成（staging 路径待合格候选） | 真实公开失败已生成不可变 Prompt candidate；公平三 seed train/validation 对照完成且确定性门禁拒绝。Active Prompt 未改动，私有 holdout 未读取 |
 | M10 SFT/GRPO | 条件未满足 | 需要 ≥300 Episode、≥1000 优质轨迹和 GPU/预算 |
-| M11 交付展示 | 进行中 | 2026-08-09：用户已确认前端体验没有问题；完整本地栈已从干净进程复验，Secret 扫描无命中。真实录像与 CI 仍未完成；私有 holdout 包不可用且未运行 |
+| M11 交付展示 | 公开交付已完成 | 2026-08-09：公开仓库、中文求职 README、真实 GIF、架构图和报告已上线；GitHub CI 与真实 OTel scripted smoke 均通过，Secret 扫描无命中。私有 holdout 包不可用且未运行，不作对应结论 |
 
 ### 26.1 项目完成等级
 
@@ -2905,11 +2905,11 @@ node --version
 
 ### 31.5 交付
 
-- [ ] README、架构、评测、安全和限制文档与实际实现一致。
-- [ ] 新用户能按文档启动并复现至少一个 Episode。
+- [x] README、架构、评测、安全和限制文档与实际实现一致。
+- [x] 新用户能按文档启动并复现至少一个 Episode。
 - [x] 前端能完整展示调查、证据、审批和验证。
-- [ ] 公开仓库、GIF、日志和报告无 Secret。
-- [ ] 简历指标来自冻结评测报告。
+- [x] 公开仓库、GIF、日志和报告无 Secret。
+- [x] 简历指标来自冻结评测报告。
 
 ## 32. 实施记录
 
@@ -2917,6 +2917,7 @@ node --version
 
 | 日期 | 任务 | 变更摘要 | 验证命令与结果 | 决策/风险 |
 |---|---|---|---|---|
+| 2026-08-09 | M11 公开发布、GitHub Runner 验收与求职叙事重构 | 创建公开仓库 `dingsleep/IncidentPilot` 并推送完整代码、真实 GIF、中文架构图与冻结评测。README 从功能清单重构为“事故难题 → 端到端实现 → 多 Agent 协作 → 技术选型 → 失败迭代 → 量化证据 → 前端交付”主线，补充最小上下文、typed reducer、模板化 Query、ToolCall 失败类型、checkpoint 审批暂停等设计细节，并明确真实运行遥测不等于生产数据。公开首轮 CI 暴露 Windows lock 的 `pywin32`、Linux `src` 导入和 integration scope 三项交付缺陷，分别用 platform marker、`PYTHONPATH` 和测试分层修复，未删除测试或降低标准。 | GitHub CI run `31300740055`=`success`：Ruff 通过、Pyright 0 errors、Python `248 passed, 1 skipped, 1 deselected`、Web `10 files / 19 tests`；Evaluation smoke run `31300633601`=`success`：验证 OTel Demo `2.2.0` 并启动真实遥测后端，scripted Episode `1 passed`。README/交付回归=`9 passed`，公开 README/SVG/GIF 均 HTTP 200，发布前 Secret 扫描命中=`0`。 | 公开结果仍仅代表本地参考实现与 public validation，不宣称生产 SLA 或私有 holdout。早期失败 Actions 保留以形成可审计排错记录；M10 后训练继续因数据/GPU 条件不足而不伪造。 |
 | 2026-08-09 | M11 中文求职主页、真实 GIF 与公开前审查 | README 求职主线补入用户录制的真实 GIF，并强化“不是普通 Agent Demo”、六类关键难题与工程优化、前端产品体验、真实评测、安全边界和工程能力；运行说明压缩为最短路径。GIF 位于 `GIF/演示动画.gif`，中文架构图位于 `docs/assets/incidentpilot-architecture.svg`。本地 CI 草案保持无模型 PR 检查与手动 scripted-real-backend smoke，所有 Action 固定 SHA。 | GIF=`1890×927`、`102.59s`、`17.46MB`；抽查 5 个时间点，未出现 `.env`、Key、Token 或本机路径。公开候选 696 文件、总计 `26.13MB`、最大单文件 `17.46MB`；源码、文档与公开 artifacts Secret 扫描命中=`0`，`.env`/`.runtime` 均被忽略。`test_delivery_docs.py`=`6 passed`，SVG XML 有效，6 个 workflow `uses:` 均固定 40 位 SHA；发布前 Python unit+contract=`247 passed, 1 skipped`，Ruff/Pyright 通过，前端 typecheck/ESLint/Vitest=`19 passed`、audit=0。 | README 中的 baseline 明确属于更早候选，不伪装成 v15 同轮提升；GIF 展示真实后端流程，不声称私有 holdout 或生产部署。用户已授权公开 GitHub、CI、commit 和 push；公开上传完成前不提前勾选仓库与 GitHub Runner 验收。 |
 | 2026-08-09 | M11 中文求职展示与本地 CI 草案 | 按用户要求暂停 GitHub 创建、commit 与 push。README 默认阅读路径重构为中文求职版，集中展示产品定位、问题、七项工程亮点、真实评测、用户路径、启动方式、能力与限制；旧英文实施记录保留在默认折叠归档中。新增可直接由 GitHub 渲染的中文 SVG 架构图，展示真实 OTel 输入、有界多 Agent、Evidence 诊断、确定性安全门、人工批准、独立 Action MCP、恢复验证和离线受控进化。新增 `ci.yml` 与手动 `evaluation-smoke.yml` 草案：普通 CI 不调用模型；Smoke 使用 scripted agent + 真实 OTel 后端；权限只读、第三方 Action 固定 SHA、无 Secret 引用。 | 先新增失败测试证明中文求职首页、架构图与 CI 文件缺失；实现后 `test_delivery_docs.py`=`6 passed`，SVG XML 与标题验证通过，6 个 `uses:` 均为 40 位 commit SHA。发布前本地质量门槛：Python unit+contract=`247 passed, 1 skipped`，Ruff/Pyright 通过；前端 typecheck/ESLint/Vitest=`10 files / 19 tests`，`npm audit`=0。SVG 以 Chrome `1600×920` 实际渲染并人工检查，预览为 `artifacts/ui/incidentpilot-architecture-preview.png`。 | 用户尚未录制真实视频，因此 README 的 GIF/视频交付项仍不勾选；CI 文件尚未在 GitHub Runner 实际运行，也不提前勾选 CI 验收。GitHub 已认证账号 `dingsleep`，但按用户最新要求未创建远程仓库、未 commit/push；仓库名称保留为 `IncidentPilot`，计划最终公开。 |
 | 2026-08-09 | M11 用户前端验收与干净启动交付复验 | 用户明确确认当前前端体验没有问题。按 README/演示脚本执行 `stop_dev.ps1` 后以 `start_dev.ps1 -SkipBuild -ApiHostPort 8201 -WebHostPort 5180` 从干净进程重新启动 pinned OTel Demo 与 `core/actions`，保留数据库和 volume；随后运行 evaluation-runner 无模型探针。公开候选文件执行模型 Key、Token、私钥和密码模式扫描，`.env`/`.runtime` Git ignore 与敏感路径索引检查。 | 启动在 114.3 秒内完成，API readiness=`ready`、Web=`200`，API、DB、Worker、Telemetry MCP、Action MCP、Demo Runner、Web 均 healthy；`smoke_otel_demo.py` 通过，15 个公开 flag 全为 `off`；evaluation-runner `--help` 退出 `0`。Chrome Playwright 复验 `/demo`、`/incidents`、`/evaluations`、`/evolution`，无 console/page/HTTP error 且水平溢出均为 `0`。公开文件 Secret 命中数=`0`，Git 索引敏感路径数=`0`。 | 本次没有运行付费模型或 holdout，没有修改 `.env`、密钥、CI，没有删除 volume，未 commit/push。录屏由用户完成；CI 和 GitHub 发布继续等待独立明确授权，M11 总验收保持未完成。 |

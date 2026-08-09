@@ -58,6 +58,31 @@ def test_readme_has_a_chinese_job_facing_overview_and_architecture_visual() -> N
     assert "确定性安全门" in architecture.read_text(encoding="utf-8")
 
 
+def test_readme_explains_implementation_real_data_and_engineering_results() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "一次事故是怎么跑通的" in readme
+    assert "多 Agent 是怎么协作的" in readme
+    assert "技术栈不是堆名词" in readme
+    assert "这些数据到底有多“真实”" in readme
+    assert "不是前端 Mock" in readme
+    assert "关键难题与工程优化：我是如何把失败变成系统能力的" in readme
+    assert "candidate-f871693e17e3" in readme
+    assert "248 passed" in readme
+
+
+def test_final_report_records_the_public_delivery_instead_of_stale_todos() -> None:
+    report = (ROOT / "docs" / "reports" / "final-evaluation.md").read_text(
+        encoding="utf-8"
+    )
+
+    assert "https://github.com/dingsleep/IncidentPilot" in report
+    assert "31300740055" in report
+    assert "31300633601" in report
+    assert "A real public demo GIF/video has not been recorded" not in report
+    assert "CI workflows were not created" not in report
+
+
 def test_ci_workflows_are_read_only_pinned_and_model_free() -> None:
     ci = _read(ROOT / ".github" / "workflows" / "ci.yml")
     evaluation = _read(ROOT / ".github" / "workflows" / "evaluation-smoke.yml")
