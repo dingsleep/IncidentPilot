@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://incidentpilot.local/schemas/holdout-public-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "case_id", "alert", "budgets"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "case_id": {"type": "string", "pattern": "^case-h[0-9]{3}$"},
+    "alert": {"type": "object", "additionalProperties": false, "required": ["title", "severity", "service_hint", "labels"], "properties": {"title": {"type": "string", "minLength": 1, "maxLength": 500}, "description": {"type": "string", "maxLength": 4000}, "severity": {"enum": ["P1", "P2", "P3", "P4"]}, "service_hint": {"type": ["string", "null"], "maxLength": 100}, "labels": {"type": "object", "additionalProperties": {"type": "string"}}}},
+    "budgets": {"type": "object", "additionalProperties": false, "required": ["max_duration_seconds", "max_read_tool_calls", "max_model_tokens"], "properties": {"max_duration_seconds": {"type": "integer", "minimum": 60, "maximum": 3600}, "max_read_tool_calls": {"type": "integer", "minimum": 1, "maximum": 24}, "max_model_tokens": {"type": "integer", "minimum": 1000, "maximum": 200000}}}
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "policy_version": "taxonomy-v8",
+  "train": {
+    "path": "scenarios/taxonomy/train.yaml",
+    "sha256": "7227e96a94add8ec3318ed728a2eb0369eb970c08594a42887ff54aec24f9c95"
+  },
+  "validation": {
+    "path": "scenarios/taxonomy/validation.yaml",
+    "sha256": "3f80bfd721a45cce17a9142970083bc22007fbaea13894ba499197d636697a5c"
+  }
+}

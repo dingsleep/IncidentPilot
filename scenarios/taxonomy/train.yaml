@@ -1,0 +1,63 @@
+schema_version: 1
+split: train
+cases:
+  - id: tax-train-cache-search
+    rca: {symptom_service: search-api, root_cause_service: search-api, dependency_service: catalog-cache}
+    facts: {cache_hit_success: true, cache_miss_failure: true, failure_types: [not_found]}
+    expected_category: cache_failure
+  - id: tax-train-cache-profile
+    rca: {symptom_service: profile-api, root_cause_service: profile-api, dependency_service: profile-store}
+    facts: {cache_hit_success: true, cache_miss_failure: true, failure_types: [invalid_argument]}
+    expected_category: cache_failure
+  - id: tax-train-cache-pricing
+    rca: {symptom_service: pricing-api, root_cause_service: pricing-api, dependency_service: discount-cache}
+    facts: {cache_hit_success: true, cache_miss_failure: true}
+    expected_category: cache_failure
+  - id: tax-train-rate-ads
+    rca: {symptom_service: ads-api, root_cause_service: ads-api, dependency_service: ad-exchange}
+    facts: {rate_limit_observed: true}
+    expected_category: upstream_rate_limit
+  - id: tax-train-rate-checkout
+    rca: {symptom_service: checkout-api, root_cause_service: tax-provider, dependency_service: tax-provider}
+    facts: {rate_limit_observed: true}
+    expected_category: upstream_rate_limit
+  - id: tax-train-rate-ingest
+    rca: {symptom_service: ingest-api, root_cause_service: event-gateway, dependency_service: event-gateway}
+    facts: {rate_limit_observed: true, failure_types: [unavailable]}
+    expected_category: upstream_rate_limit
+  - id: tax-train-unreachable-orders
+    rca: {symptom_service: orders-api, root_cause_service: orders-api, dependency_service: inventory-api}
+    facts: {failure_types: [name_resolution_error]}
+    expected_category: dependency_unreachable
+  - id: tax-train-unreachable-mailer
+    rca: {symptom_service: mailer-api, root_cause_service: mailer-api, dependency_service: smtp-gateway}
+    facts: {failure_types: [connection_refused]}
+    expected_category: dependency_unreachable
+  - id: tax-train-unreachable-billing
+    rca: {symptom_service: billing-api, root_cause_service: billing-api, dependency_service: bank-api}
+    facts: {failure_types: [deadline_exceeded]}
+    expected_category: dependency_unreachable
+  - id: tax-train-dependency-storefront
+    rca: {symptom_service: storefront-api, root_cause_service: catalog-api, dependency_service: catalog-api}
+    facts: {failure_types: [not_found]}
+    expected_category: dependency_failure
+  - id: tax-train-dependency-checkout
+    rca: {symptom_service: checkout-worker, root_cause_service: payment-api, dependency_service: payment-api}
+    facts: {failure_types: [invalid_argument]}
+    expected_category: dependency_failure
+  - id: tax-train-dependency-report
+    rca: {symptom_service: report-api, root_cause_service: warehouse-api, dependency_service: warehouse-api}
+    facts: {}
+    expected_category: dependency_failure
+  - id: tax-train-application-basket
+    rca: {symptom_service: basket-api, root_cause_service: basket-api, dependency_service: basket-store}
+    facts: {failure_types: [storage_connection_failure], observed_containers: [basket-store]}
+    expected_category: application_failure
+  - id: tax-train-application-auth
+    rca: {symptom_service: auth-api, root_cause_service: auth-api}
+    facts: {failure_types: [invalid_argument]}
+    expected_category: application_failure
+  - id: tax-train-application-image
+    rca: {symptom_service: image-api, root_cause_service: image-api}
+    facts: {}
+    expected_category: application_failure

@@ -1,0 +1,13 @@
+.env
+.git
+.runtime
+.pytest_cache
+.ruff_cache
+__pycache__
+artifacts
+evaluation
+tests
+web/node_modules
+web/dist
+web/playwright-report
+web/test-results

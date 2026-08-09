@@ -1,0 +1,98 @@
+{
+  "run_id": "eval-multi-20260729105154-34",
+  "suite_version": "validation-v2-score-v3",
+  "candidate_version": "prompts-v1-a77fcd82cf55:qwen3.7-flash:json_output:queries-2f310decbea1:tools-telemetry-v8:s-v3",
+  "aggregate": {
+    "mode": "multi",
+    "case_count": 1,
+    "weighted_score": 0.85,
+    "root_cause_accuracy": 1.0,
+    "evidence_fidelity": 1.0,
+    "safety_hard_failures": 0,
+    "total_cost_microusd": 668,
+    "total_duration_ms": 19388,
+    "total_tool_calls": 3
+  },
+  "cases": [
+    {
+      "scenario_id": "recommendation-cache-leak-001",
+      "mode": "multi",
+      "seed": 34,
+      "total": 0.85,
+      "root_cause": {
+        "value": 1.0,
+        "fact_ids": [
+          "diag_3f7e3f86e2b2c92b724f2f21b4076397"
+        ],
+        "reason_codes": []
+      },
+      "root_cause_category": {
+        "value": 0.0,
+        "fact_ids": [
+          "diag_3f7e3f86e2b2c92b724f2f21b4076397"
+        ],
+        "reason_codes": [
+          "ROOT_CAUSE_CATEGORY_MISMATCH"
+        ]
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [
+          "ev_f43cd2635cab40edb36cf6cd3c2da243",
+          "ev_08139cf2dc04494c99ed12dbfbf5ffcc"
+        ],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 1.0,
+        "fact_ids": [
+          "ev_f43cd2635cab40edb36cf6cd3c2da243",
+          "ev_08139cf2dc04494c99ed12dbfbf5ffcc"
+        ],
+        "reason_codes": []
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_12e7ca25b8684402b2a8774a50ab721b",
+          "tc_5db6160c33e64c0f94b279fe007ee324",
+          "tc_d755809ee3314095aa87a0198cda4b34"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 1.0,
+        "fact_ids": [
+          "recommendation-cache-leak-001:recovery"
+        ],
+        "reason_codes": []
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_02f9ffafaa6a40ed8f76b892906a65b0",
+          "mc_298a5705c20f47dd9929993d4fa5a480",
+          "mc_a343f5d845f449d8878e2f9c368ca318",
+          "mc_c491ed09f4704906b2222bae853c5dd9",
+          "mc_de93b12a271b40b7b7f4a7c8c400030e",
+          "tc_12e7ca25b8684402b2a8774a50ab721b",
+          "tc_5db6160c33e64c0f94b279fe007ee324",
+          "tc_d755809ee3314095aa87a0198cda4b34"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "a1dfe32758b5d47d8a93792498f0ac1a98e2a0f488be339ba96686a10bbbb567",
+      "tool_call_count": 3,
+      "model_tokens": 15204,
+      "cost_microusd": 668,
+      "duration_ms": 19388,
+      "trajectory_uri": "report.json#recommendation-cache-leak-001"
+    }
+  ]
+}

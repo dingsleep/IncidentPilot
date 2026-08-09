@@ -1,0 +1,91 @@
+{
+  "run_id": "eval-multi-20260803070717-64",
+  "suite_version": "train-v3-score-v5",
+  "candidate_version": "p1-8eeb334ca321:qwen3.7-flash:json_output:q-1204c16a9e14:t-telemetry-v9:s-v12-tax7",
+  "aggregate": {
+    "mode": "multi",
+    "case_count": 1,
+    "weighted_score": 0.55,
+    "root_cause_accuracy": 0.0,
+    "evidence_fidelity": 1.0,
+    "safety_hard_failures": 0,
+    "total_cost_microusd": 703,
+    "total_duration_ms": 24293,
+    "total_tool_calls": 3
+  },
+  "cases": [
+    {
+      "scenario_id": "product-catalog-failure-001",
+      "mode": "multi",
+      "seed": 64,
+      "total": 0.55,
+      "root_cause": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "DIAGNOSIS_MISSING"
+        ]
+      },
+      "root_cause_category": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "ROOT_CAUSE_CATEGORY_MISMATCH"
+        ]
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "SIGNALS_MISSING"
+        ]
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_45d35ad3354b43968b9e9f78c4bdbcf7",
+          "tc_5270433a47334104b90343ac71ab00f9",
+          "tc_682a0f3ed71d4ae089dd8a85bfb8f22e"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 1.0,
+        "fact_ids": [
+          "product-catalog-failure-001:recovery"
+        ],
+        "reason_codes": []
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_62dd2cb3df1c4716968ef40b5da8f8da",
+          "mc_9e455128935641bd8124ece89b790c3e",
+          "mc_c6795d8315d24dea8692778f886b19a3",
+          "mc_f0046aaa49554d9bb16145634dc48a4c",
+          "tc_45d35ad3354b43968b9e9f78c4bdbcf7",
+          "tc_5270433a47334104b90343ac71ab00f9",
+          "tc_682a0f3ed71d4ae089dd8a85bfb8f22e"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "7444201d2eb316babebc76acaf8544ca541418330aebe8383c6873da44816c07",
+      "tool_call_count": 3,
+      "model_tokens": 16203,
+      "cost_microusd": 703,
+      "duration_ms": 24293,
+      "trajectory_uri": "report.json#product-catalog-failure-001"
+    }
+  ]
+}

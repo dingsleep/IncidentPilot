@@ -1,0 +1,4 @@
+schema_version: 1
+case_id: case-h002
+alert: {title: Auxiliary content latency exceeds SLO, severity: P3, service_hint: ad, labels: {alertname: AuxiliaryContentLatency}}
+budgets: {max_duration_seconds: 600, max_read_tool_calls: 24, max_model_tokens: 60000}

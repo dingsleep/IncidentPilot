@@ -1,0 +1,43 @@
+schema_version: 1
+split: validation
+cases:
+  - id: tax-validation-cache-feed
+    rca: {symptom_service: feed-api, root_cause_service: feed-api, dependency_service: content-cache}
+    facts: {cache_hit_success: true, cache_miss_failure: true, failure_types: [not_found]}
+    expected_category: cache_failure
+  - id: tax-validation-cache-session
+    rca: {symptom_service: session-api, root_cause_service: session-api, dependency_service: session-store}
+    facts: {cache_hit_success: true, cache_miss_failure: true, failure_types: [invalid_argument]}
+    expected_category: cache_failure
+  - id: tax-validation-rate-bidding
+    rca: {symptom_service: bidding-api, root_cause_service: bid-exchange, dependency_service: bid-exchange}
+    facts: {rate_limit_observed: true}
+    expected_category: upstream_rate_limit
+  - id: tax-validation-rate-webhook
+    rca: {symptom_service: webhook-api, root_cause_service: webhook-api, dependency_service: partner-api}
+    facts: {rate_limit_observed: true, failure_types: [unavailable]}
+    expected_category: upstream_rate_limit
+  - id: tax-validation-unreachable-shipment
+    rca: {symptom_service: shipment-api, root_cause_service: shipment-api, dependency_service: carrier-api}
+    facts: {failure_types: [unavailable]}
+    expected_category: dependency_unreachable
+  - id: tax-validation-unreachable-notification
+    rca: {symptom_service: notification-api, root_cause_service: notification-api, dependency_service: push-api}
+    facts: {failure_types: [connection_refused, deadline_exceeded]}
+    expected_category: dependency_unreachable
+  - id: tax-validation-dependency-portal
+    rca: {symptom_service: portal-api, root_cause_service: account-api, dependency_service: account-api}
+    facts: {failure_types: [not_found]}
+    expected_category: dependency_failure
+  - id: tax-validation-dependency-invoice
+    rca: {symptom_service: invoice-api, root_cause_service: tax-api, dependency_service: tax-api}
+    facts: {failure_types: [invalid_argument]}
+    expected_category: dependency_failure
+  - id: tax-validation-application-wishlist
+    rca: {symptom_service: wishlist-api, root_cause_service: wishlist-api, dependency_service: wishlist-store}
+    facts: {failure_types: [storage_connection_failure], observed_containers: [wishlist-store]}
+    expected_category: application_failure
+  - id: tax-validation-application-parser
+    rca: {symptom_service: parser-api, root_cause_service: parser-api}
+    facts: {}
+    expected_category: application_failure

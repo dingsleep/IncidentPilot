@@ -1,0 +1,323 @@
+{
+  "run_id": "eval-multi-20260729104213-31",
+  "suite_version": "validation-v2-score-v3",
+  "candidate_version": "prompts-v1-32c4cdd3b760:qwen3.7-flash:json_output:queries-2f310decbea1:tools-telemetry-v8:s-v3",
+  "aggregate": {
+    "mode": "multi",
+    "case_count": 4,
+    "weighted_score": 0.954167,
+    "root_cause_accuracy": 1.0,
+    "evidence_fidelity": 1.0,
+    "safety_hard_failures": 0,
+    "total_cost_microusd": 2528,
+    "total_duration_ms": 74756,
+    "total_tool_calls": 12
+  },
+  "cases": [
+    {
+      "scenario_id": "cart-failure-001",
+      "mode": "multi",
+      "seed": 31,
+      "total": 1.0,
+      "root_cause": {
+        "value": 1.0,
+        "fact_ids": [
+          "diag_39bc4757ba9d342196366e05b3a76f72"
+        ],
+        "reason_codes": []
+      },
+      "root_cause_category": {
+        "value": 1.0,
+        "fact_ids": [
+          "diag_39bc4757ba9d342196366e05b3a76f72"
+        ],
+        "reason_codes": []
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [
+          "ev_3e1d55693cb3406183ffa23cfd5a61f0",
+          "ev_a0aa7f4665d04936bd6396966fa18c54"
+        ],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 1.0,
+        "fact_ids": [
+          "ev_3e1d55693cb3406183ffa23cfd5a61f0",
+          "ev_a0aa7f4665d04936bd6396966fa18c54"
+        ],
+        "reason_codes": []
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_4df805d9a7c94f0aa7b523bce65d48a6",
+          "tc_9d3d11436ad84094a3c211a18588b446",
+          "tc_edfb14efbbbf416990b8cc5afaffcdfb"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 1.0,
+        "fact_ids": [
+          "cart-failure-001:recovery"
+        ],
+        "reason_codes": []
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_2fabade0e2ed44df8b539a3e6e39ced6",
+          "mc_34e3671087be4f4ea424b830a62936e1",
+          "mc_68cb4582b9fd405ebc37b67a605e0a3e",
+          "mc_7223629321e440c88d335c6768f29380",
+          "mc_d672c8099cf44b9fa1b290ac168549d7",
+          "tc_4df805d9a7c94f0aa7b523bce65d48a6",
+          "tc_9d3d11436ad84094a3c211a18588b446",
+          "tc_edfb14efbbbf416990b8cc5afaffcdfb"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "9b4030fa876a4aea0bb4abd0b5e3890a6c3c4e844aba8af7d0c0eb4a52eb3f29",
+      "tool_call_count": 3,
+      "model_tokens": 11919,
+      "cost_microusd": 596,
+      "duration_ms": 19015,
+      "trajectory_uri": "report.json#cart-failure-001"
+    },
+    {
+      "scenario_id": "no-fault-control-001",
+      "mode": "multi",
+      "seed": 32,
+      "total": 1.0,
+      "root_cause": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "root_cause_category": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_0f45a6f03421460b8fad25bf7b660dae",
+          "tc_3ce48baa5a5a40b7a17ac5d88fd4fbb9",
+          "tc_956ba6dc34f4429481f972b9f76fb171"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 1.0,
+        "fact_ids": [
+          "no-fault-control-001:recovery"
+        ],
+        "reason_codes": []
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_7073f94cfbd3413bab14ab5e47653533",
+          "mc_c1898be80a1044439380a9c7e9125626",
+          "mc_d321b88f0f0c4282a38880d6ee437a2e",
+          "mc_eca679addb904b9c88566b1cedbe9b2b",
+          "tc_0f45a6f03421460b8fad25bf7b660dae",
+          "tc_3ce48baa5a5a40b7a17ac5d88fd4fbb9",
+          "tc_956ba6dc34f4429481f972b9f76fb171"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "c5c65280ee0ba5a8fec8f1f1e7b03ed4aa50396dc340ec46c8f686b4b889f15f",
+      "tool_call_count": 3,
+      "model_tokens": 8487,
+      "cost_microusd": 462,
+      "duration_ms": 17351,
+      "trajectory_uri": "report.json#no-fault-control-001"
+    },
+    {
+      "scenario_id": "payment-unreachable-001",
+      "mode": "multi",
+      "seed": 33,
+      "total": 0.966667,
+      "root_cause": {
+        "value": 1.0,
+        "fact_ids": [
+          "diag_e13f8b7f294638b8ba396db5c5eed5ab"
+        ],
+        "reason_codes": []
+      },
+      "root_cause_category": {
+        "value": 1.0,
+        "fact_ids": [
+          "diag_e13f8b7f294638b8ba396db5c5eed5ab"
+        ],
+        "reason_codes": []
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [
+          "ev_18031c42bee54bc7941e81d151760ca6",
+          "ev_c203530576794c76b732a08a2d0ba665"
+        ],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 0.666667,
+        "fact_ids": [
+          "ev_18031c42bee54bc7941e81d151760ca6",
+          "ev_c203530576794c76b732a08a2d0ba665"
+        ],
+        "reason_codes": [
+          "SIGNALS_MISSING"
+        ]
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_3013eaa6af5248e2a04e2516550ebbba",
+          "tc_cf27f5852e034fc89e509bcf0094e774",
+          "tc_e63bd534904d498d9efc75cde0c89259"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 1.0,
+        "fact_ids": [
+          "payment-unreachable-001:recovery"
+        ],
+        "reason_codes": []
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_15527e2e051041b181f2f89ab59bf52c",
+          "mc_5316e56f3f2e4c3cbff7817ae308bc17",
+          "mc_8450cc66720e44ed8ee266a6eb5d4d3a",
+          "mc_b277cc44457e49a1903e1559f1847dee",
+          "mc_d4477d76055348608ce1341519464371",
+          "tc_3013eaa6af5248e2a04e2516550ebbba",
+          "tc_cf27f5852e034fc89e509bcf0094e774",
+          "tc_e63bd534904d498d9efc75cde0c89259"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "cf43b6b0ff90163050a233bce254ecb6d0af7740ef0e67095c973bc089836acc",
+      "tool_call_count": 3,
+      "model_tokens": 16448,
+      "cost_microusd": 751,
+      "duration_ms": 20104,
+      "trajectory_uri": "report.json#payment-unreachable-001"
+    },
+    {
+      "scenario_id": "recommendation-cache-leak-001",
+      "mode": "multi",
+      "seed": 34,
+      "total": 0.85,
+      "root_cause": {
+        "value": 1.0,
+        "fact_ids": [
+          "diag_e6bff3e0a3e819ccc898875f01c459cd"
+        ],
+        "reason_codes": []
+      },
+      "root_cause_category": {
+        "value": 0.0,
+        "fact_ids": [
+          "diag_e6bff3e0a3e819ccc898875f01c459cd"
+        ],
+        "reason_codes": [
+          "ROOT_CAUSE_CATEGORY_MISMATCH"
+        ]
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [
+          "ev_45fc2ddbccf54797ac4c9800a5c41fb1",
+          "ev_433526d732504d8b9513cba6e32b6c9c"
+        ],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 1.0,
+        "fact_ids": [
+          "ev_45fc2ddbccf54797ac4c9800a5c41fb1",
+          "ev_433526d732504d8b9513cba6e32b6c9c"
+        ],
+        "reason_codes": []
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_44df4fb4d5774b729510191b8ca8fd8a",
+          "tc_73fc0fc0bd7a410e8fd26a924a46b0ce",
+          "tc_9b9397d11e6c4e60817cb80d4d0956e0"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 1.0,
+        "fact_ids": [
+          "recommendation-cache-leak-001:recovery"
+        ],
+        "reason_codes": []
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_1a87a267b2cf41d9afaddb6a394740ec",
+          "mc_59d3fd6172b5456ebbf7643f33d728eb",
+          "mc_5eb705e4d9b84c23bf94d7ff9ea523d1",
+          "mc_f278ea9756174d31932e01259e95f544",
+          "mc_fa962a9f49954565a4ee26d74c1bde8d",
+          "tc_44df4fb4d5774b729510191b8ca8fd8a",
+          "tc_73fc0fc0bd7a410e8fd26a924a46b0ce",
+          "tc_9b9397d11e6c4e60817cb80d4d0956e0"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "b8732d3b3c03332e1291070c1ad831fa2bc0a6a93642f26b857594615ccf5955",
+      "tool_call_count": 3,
+      "model_tokens": 16191,
+      "cost_microusd": 719,
+      "duration_ms": 18286,
+      "trajectory_uri": "report.json#recommendation-cache-leak-001"
+    }
+  ]
+}

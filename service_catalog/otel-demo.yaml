@@ -1,0 +1,121 @@
+schema_version: 1
+services:
+  - name: frontend-proxy
+    aliases: [gateway, storefront-proxy]
+    criticality: critical
+    protocol: http
+    dependencies: [frontend]
+    allow_restart: true
+    owner: platform-team
+  - name: frontend
+    aliases: [storefront, web]
+    criticality: critical
+    protocol: http
+    dependencies: [ad, cart, checkout, currency, product-catalog, recommendation]
+    allow_restart: true
+    owner: frontend-team
+  - name: checkout
+    aliases: [checkout-service, order-service]
+    criticality: critical
+    protocol: grpc
+    dependencies: [cart, currency, email, kafka, payment, product-catalog, shipping]
+    allow_restart: true
+    owner: checkout-team
+  - name: payment
+    aliases: [payment-service, charge-service]
+    criticality: critical
+    protocol: grpc
+    dependencies: [flagd]
+    allow_restart: true
+    owner: payment-team
+  - name: cart
+    aliases: [cart-service, basket]
+    criticality: high
+    protocol: grpc
+    dependencies: [valkey-cart]
+    allow_restart: true
+    owner: cart-team
+  - name: product-catalog
+    aliases: [product-catalog-service, catalog]
+    criticality: high
+    protocol: grpc
+    dependencies: []
+    allow_restart: true
+    owner: catalog-team
+  - name: recommendation
+    aliases: [recommendation-service, recommendations]
+    criticality: medium
+    protocol: grpc
+    dependencies: [flagd, product-catalog]
+    allow_restart: true
+    owner: recommendation-team
+  - name: shipping
+    aliases: [shipping-service, fulfillment]
+    criticality: high
+    protocol: grpc
+    dependencies: [quote]
+    allow_restart: true
+    owner: shipping-team
+  - name: currency
+    aliases: [currency-service, fx]
+    criticality: high
+    protocol: grpc
+    dependencies: []
+    allow_restart: true
+    owner: currency-team
+  - name: email
+    aliases: [email-service, notifications]
+    criticality: medium
+    protocol: kafka
+    dependencies: [kafka]
+    allow_restart: true
+    owner: email-team
+  - name: ad
+    aliases: [ad-service, ads]
+    criticality: low
+    protocol: grpc
+    dependencies: []
+    allow_restart: true
+    owner: ad-team
+  - name: product-reviews
+    aliases: [product-reviews-service, reviews]
+    criticality: medium
+    protocol: grpc
+    dependencies: [llm, product-catalog]
+    allow_restart: true
+    owner: catalog-team
+  - name: llm
+    aliases: [llm-service, ai-provider]
+    criticality: medium
+    protocol: http
+    dependencies: []
+    allow_restart: false
+    owner: platform-team
+  - name: quote
+    aliases: [quote-service, shipping-quote]
+    criticality: medium
+    protocol: http
+    dependencies: []
+    allow_restart: true
+    owner: shipping-team
+  - name: flagd
+    aliases: [feature-flags, flagd-service]
+    criticality: high
+    protocol: ofrep
+    dependencies: []
+    allow_restart: true
+    owner: platform-team
+  - name: kafka
+    aliases: [event-bus, broker]
+    criticality: high
+    protocol: kafka
+    dependencies: []
+    allow_restart: false
+    owner: platform-team
+  - name: valkey-cart
+    aliases: [cart-cache, redis-cart]
+    criticality: high
+    protocol: redis
+    dependencies: []
+    allow_restart: false
+    owner: platform-team

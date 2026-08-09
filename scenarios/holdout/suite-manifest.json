@@ -1,0 +1,18 @@
+{
+  "private_bundle_path": "artifacts/private/holdout-v1.json.enc",
+  "private_bundle_sha256": null,
+  "public_cases": [
+    {"case_id": "case-h001", "path": "scenarios/holdout/case-h001.public.yaml", "sha256": "b62467e7409d623a7889713b855ea093f9e78bf71d3993f111d0de47d7b34b9a"},
+    {"case_id": "case-h002", "path": "scenarios/holdout/case-h002.public.yaml", "sha256": "74991711956a4bd784fc5655790f7f9bb412786c404017606ba44193daa2ebf7"},
+    {"case_id": "case-h003", "path": "scenarios/holdout/case-h003.public.yaml", "sha256": "edf2e26ddae768d8e6487181186e2ce58f8d4a898cb8be0bdcd483c8b5c066d2"},
+    {"case_id": "case-h004", "path": "scenarios/holdout/case-h004.public.yaml", "sha256": "3c52a8dc81d453862a8fa48877555795355eef7c61b2d74721782fac565f7caf"}
+  ],
+  "schema_version": 1,
+  "schemas": {
+    "holdout_private": {"path": "scenarios/holdout-private.schema.json", "sha256": "fbc351163402bc3d8311c4b6b082eb6761acb6937026b5b0169bf8d7d5e1a7f4"},
+    "holdout_public": {"path": "scenarios/holdout-public.schema.json", "sha256": "daa866d8dfcb217047a5fe0bc349c75ee5764d84d312d3837ef7fe976d073cdc"},
+    "train_validation": {"path": "scenarios/schema.json", "sha256": "879afc5ff98ec973eebc85b6d1c0b47ec29f366ab7113bc40485aa453183d602"}
+  },
+  "status": "SKIPPED_MISSING_PRIVATE_SUITE",
+  "suite_version": "holdout-v1"
+}

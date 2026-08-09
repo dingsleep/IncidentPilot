@@ -1,0 +1,98 @@
+{
+  "run_id": "eval-multi-20260803064804-67",
+  "suite_version": "train-v3-score-v5",
+  "candidate_version": "p1-8eeb334ca321:qwen3.7-flash:json_output:q-1204c16a9e14:t-telemetry-v9:s-v12-tax7",
+  "aggregate": {
+    "mode": "multi",
+    "case_count": 1,
+    "weighted_score": 1.0,
+    "root_cause_accuracy": 1.0,
+    "evidence_fidelity": 1.0,
+    "safety_hard_failures": 0,
+    "total_cost_microusd": 991,
+    "total_duration_ms": 34308,
+    "total_tool_calls": 3
+  },
+  "cases": [
+    {
+      "scenario_id": "payment-failure-001",
+      "mode": "multi",
+      "seed": 67,
+      "total": 1.0,
+      "root_cause": {
+        "value": 1.0,
+        "fact_ids": [
+          "diag_6d3fdbd5fe1941478058e520f9c13c40"
+        ],
+        "reason_codes": []
+      },
+      "root_cause_category": {
+        "value": 1.0,
+        "fact_ids": [
+          "diag_6d3fdbd5fe1941478058e520f9c13c40"
+        ],
+        "reason_codes": []
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [
+          "ev_57e0ba01fbe646d2990f5c0654c5c447",
+          "ev_f9107eade6b8426481b56beae5815e8c",
+          "ev_3a2791d4e2aa4c37b2e336c5b5de25e6"
+        ],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 1.0,
+        "fact_ids": [
+          "ev_57e0ba01fbe646d2990f5c0654c5c447",
+          "ev_f9107eade6b8426481b56beae5815e8c",
+          "ev_3a2791d4e2aa4c37b2e336c5b5de25e6"
+        ],
+        "reason_codes": []
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_4b1f76c4ecf3436585dc914376afd31d",
+          "tc_9e8c57c19c7d49269738acde1a74abf1",
+          "tc_e472329cbe28402aac8f7b80e63c9a55"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 1.0,
+        "fact_ids": [
+          "payment-failure-001:recovery"
+        ],
+        "reason_codes": []
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_0a9d97c301e745d28866c37f31b6e297",
+          "mc_3164e87973274281bc5728c9c3858871",
+          "mc_8f1220651d0b4cee84157220b32eaf0e",
+          "mc_abdc8ceb2fe94231ad29083e8f16212a",
+          "mc_ddb965a68b5745a1a333a841594a445d",
+          "tc_4b1f76c4ecf3436585dc914376afd31d",
+          "tc_9e8c57c19c7d49269738acde1a74abf1",
+          "tc_e472329cbe28402aac8f7b80e63c9a55"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "c10c12f6356ac425d890052d2ee6de37c4c9c9c21f6d44896a080dba6b9a530a",
+      "tool_call_count": 3,
+      "model_tokens": 19929,
+      "cost_microusd": 991,
+      "duration_ms": 34308,
+      "trajectory_uri": "report.json#payment-failure-001"
+    }
+  ]
+}

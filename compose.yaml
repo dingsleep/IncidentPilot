@@ -1,0 +1,185 @@
+services:
+  incidentpilot-db:
+    image: pgvector/pgvector:pg16@sha256:1d533553fefe4f12e5d80c7b80622ba0c382abb5758856f52983d8789179f0fb
+    container_name: incidentpilot-db
+    profiles: ["core", "actions", "evaluation"]
+    environment:
+      POSTGRES_DB: incidentpilot
+      POSTGRES_USER: migration_role
+      POSTGRES_PASSWORD: migration-local-only
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U migration_role -d incidentpilot"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes:
+      - incidentpilot-postgres-data:/var/lib/postgresql/data
+      - ./infra/postgres/init-roles.sql:/docker-entrypoint-initdb.d/10-init-roles.sql:ro
+
+  migration:
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+    profiles: ["core", "actions", "evaluation"]
+    environment:
+      INCIDENTPILOT_MIGRATION_DATABASE_URL: postgresql+psycopg://migration_role:migration-local-only@incidentpilot-db:5432/incidentpilot
+    command: ["sh", "-c", "alembic upgrade head && python scripts/seed_local_data.py"]
+    depends_on:
+      incidentpilot-db:
+        condition: service_healthy
+    read_only: true
+    tmpfs: [/tmp]
+
+  incident-api:
+    build:
+      context: .
+      dockerfile: infra/docker/api.Dockerfile
+    profiles: ["core"]
+    environment:
+      INCIDENTPILOT_API_DATABASE_URL: postgresql+asyncpg://incident_api_role:api-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_ENV: development
+      INCIDENTPILOT_ACTION_ENABLED: ${INCIDENTPILOT_ACTION_ENABLED:-false}
+      INCIDENTPILOT_ACTION_APPROVAL_SIGNING_KEY: ${INCIDENTPILOT_ACTION_APPROVAL_SIGNING_KEY:-}
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+    ports: ["127.0.0.1:${INCIDENTPILOT_API_HOST_PORT:-8200}:8200"]
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    read_only: true
+    tmpfs: [/tmp]
+    networks: [default, opentelemetry-demo]
+
+  telemetry-mcp:
+    build:
+      context: .
+      dockerfile: infra/docker/mcp.Dockerfile
+    profiles: ["core"]
+    environment:
+      INCIDENTPILOT_TELEMETRY_MCP_DATABASE_URL: postgresql+asyncpg://telemetry_mcp_role:telemetry-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_TELEMETRY_VERIFYING_KEY: ${INCIDENTPILOT_TELEMETRY_VERIFYING_KEY:-replace-with-development-public-key}
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+    ports: ["127.0.0.1:8101:8101"]
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    networks: [default, opentelemetry-demo]
+    read_only: true
+    tmpfs: [/tmp]
+
+  graph-worker:
+    build:
+      context: .
+      dockerfile: infra/docker/worker.Dockerfile
+    profiles: ["core"]
+    environment:
+      INCIDENTPILOT_WORKER_DATABASE_URL: postgresql+asyncpg://graph_worker_role:worker-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_TELEMETRY_DATABASE_URL: postgresql+asyncpg://telemetry_mcp_role:telemetry-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_PROMETHEUS_URL: http://prometheus:9090
+      INCIDENTPILOT_OPENSEARCH_URL: http://opensearch:9200
+      INCIDENTPILOT_JAEGER_URL: http://jaeger:16686
+      INCIDENTPILOT_LLM_PROVIDER: ${INCIDENTPILOT_LLM_PROVIDER:-deepseek}
+      INCIDENTPILOT_LLM_BASE_URL: ${INCIDENTPILOT_LLM_BASE_URL:-https://api.deepseek.com}
+      INCIDENTPILOT_LLM_API_KEY: ${INCIDENTPILOT_LLM_API_KEY:-}
+      INCIDENTPILOT_LLM_DEEPSEEK_API_KEY: ${INCIDENTPILOT_LLM_DEEPSEEK_API_KEY:-}
+      INCIDENTPILOT_LLM_QWEN_API_KEY: ${INCIDENTPILOT_LLM_QWEN_API_KEY:-}
+      INCIDENTPILOT_MODEL_FAST: ${INCIDENTPILOT_MODEL_FAST:-}
+      INCIDENTPILOT_MODEL_STRONG: ${INCIDENTPILOT_MODEL_STRONG:-}
+      INCIDENTPILOT_ACTION_ENABLED: ${INCIDENTPILOT_ACTION_ENABLED:-false}
+      INCIDENTPILOT_ACTION_MCP_URL: http://action-mcp:8102/mcp
+      INCIDENTPILOT_APPROVAL_VERIFYING_KEY: ${INCIDENTPILOT_APPROVAL_VERIFYING_KEY:-}
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+    command: ["python", "scripts/run_read_only_worker.py"]
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+      telemetry-mcp:
+        condition: service_started
+    networks: [default, opentelemetry-demo]
+    read_only: true
+    tmpfs: [/tmp]
+
+  incident-web:
+    build:
+      context: .
+      dockerfile: infra/docker/web.Dockerfile
+    profiles: ["core"]
+    ports: ["127.0.0.1:${INCIDENTPILOT_WEB_HOST_PORT:-5173}:8080"]
+    depends_on:
+      incident-api:
+        condition: service_started
+    read_only: true
+    tmpfs: [/tmp]
+
+  demo-runner:
+    build:
+      context: .
+      dockerfile: infra/docker/demo.Dockerfile
+    profiles: ["core"]
+    environment:
+      INCIDENTPILOT_WORKER_DATABASE_URL: postgresql+asyncpg://graph_worker_role:worker-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_API_URL: http://incident-api:8200
+      INCIDENTPILOT_DEMO_FLAGD_API_URL: http://flagd-ui:4000/api
+      INCIDENTPILOT_DEMO_STOREFRONT_URL: http://frontend-proxy:8080
+      INCIDENTPILOT_EVALUATION_DATABASE_URL: postgresql+asyncpg://evaluation_role:evaluation-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_PRIVATE_MAPPING_ENCRYPTION_KEY: ${INCIDENTPILOT_PRIVATE_MAPPING_ENCRYPTION_KEY:-}
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+      incident-api:
+        condition: service_started
+    networks: [default, opentelemetry-demo]
+    read_only: true
+    tmpfs: [/tmp]
+
+  action-mcp:
+    build:
+      context: .
+      dockerfile: infra/docker/mcp.Dockerfile
+    profiles: ["actions"]
+    environment:
+      INCIDENTPILOT_ACTION_ENABLED: "true"
+      INCIDENTPILOT_ACTION_MCP_DATABASE_URL: postgresql+asyncpg://action_mcp_role:action-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_ACTION_FLAGD_API_URL: http://flagd-ui:4000/api
+      INCIDENTPILOT_APPROVAL_VERIFYING_KEY: ${INCIDENTPILOT_APPROVAL_VERIFYING_KEY:-}
+      INCIDENTPILOT_PRIVATE_MAPPING_ENCRYPTION_KEY: ${INCIDENTPILOT_PRIVATE_MAPPING_ENCRYPTION_KEY:-}
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      OTEL_EXPORTER_OTLP_METRICS_ENDPOINT: http://otel-collector:4318/v1/metrics
+    command: ["python", "-m", "incidentpilot.mcp_servers.actions.runtime", "--host", "0.0.0.0"]
+    ports: ["127.0.0.1:8102:8102"]
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    networks: [default, opentelemetry-demo]
+    read_only: true
+    tmpfs: [/tmp]
+
+  episode-runner:
+    build:
+      context: .
+      dockerfile: infra/docker/evaluation.Dockerfile
+    profiles: ["evaluation"]
+    env_file: .env
+    environment:
+      INCIDENTPILOT_API_DATABASE_URL: postgresql+asyncpg://incident_api_role:api-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_WORKER_DATABASE_URL: postgresql+asyncpg://graph_worker_role:worker-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_TELEMETRY_DATABASE_URL: postgresql+asyncpg://telemetry_mcp_role:telemetry-local-only@incidentpilot-db:5432/incidentpilot
+      INCIDENTPILOT_EVALUATION_DATABASE_URL: postgresql+asyncpg://evaluation_role:evaluation-local-only@incidentpilot-db:5432/incidentpilot
+    command: ["--help"]
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+    networks: [default, opentelemetry-demo]
+    read_only: true
+    tmpfs: [/tmp]
+
+volumes:
+  incidentpilot-postgres-data:
+
+networks:
+  opentelemetry-demo:
+    external: true

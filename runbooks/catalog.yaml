@@ -1,0 +1,16 @@
+runbooks:
+  - id: payment.dependency-unreachable
+    version: 1.0.0
+    path: payment/dependency-unreachable.md
+  - id: recommendation.memory-leak
+    version: 1.0.0
+    path: recommendation/memory-leak.md
+  - id: email.memory-leak
+    version: 1.0.0
+    path: email/memory-leak.md
+  - id: ad.high-cpu
+    version: 1.0.0
+    path: ad/high-cpu.md
+  - id: shared.service-errors
+    version: 1.0.0
+    path: shared/service-errors.md

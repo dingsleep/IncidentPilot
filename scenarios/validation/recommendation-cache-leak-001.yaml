@@ -1,0 +1,14 @@
+schema_version: 1
+id: recommendation-cache-leak-001
+family: recommendation-cache-failure
+split: validation
+environment: otel-demo-compose
+control_type: fault
+alert: {title: Recommendation responses are failing, severity: P2, service_hint: recommendation, labels: {alertname: RecommendationErrors}}
+injections: [{adapter: flagd, operation: enable, service: recommendation, scenario_key: recommendationCacheFailure, variant: "on", warmup_seconds: 30}]
+traffic: {adapter: otel-demo-http, operation: recommendations, requests: 20}
+ground_truth: {root_cause_service: recommendation, category: cache_failure, required_signal_kinds: [metric, trace]}
+allowed_actions: [rollback_change]
+recovery: {observation_seconds: 30, checks: [{template_id: service_error_ratio, service: recommendation, comparator: lt, threshold: 0.02}]}
+cleanup: [{adapter: flagd, operation: restore_snapshot}]
+budgets: {max_duration_seconds: 600, max_read_tool_calls: 24, max_model_tokens: 60000}

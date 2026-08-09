@@ -1,0 +1,14 @@
+schema_version: 1
+id: cart-failure-001
+family: cart-failure
+split: validation
+environment: otel-demo-compose
+control_type: fault
+alert: {title: Cart operations are failing, severity: P2, service_hint: cart, labels: {alertname: CartServiceErrors}}
+injections: [{adapter: flagd, operation: enable, service: cart, scenario_key: cartFailure, variant: "on", warmup_seconds: 30}]
+traffic: {adapter: otel-demo-http, operation: cart, requests: 6}
+ground_truth: {root_cause_service: cart, category: application_failure, required_signal_kinds: [metric, trace]}
+allowed_actions: [rollback_change]
+recovery: {observation_seconds: 30, checks: [{template_id: service_error_ratio, service: cart, comparator: lt, threshold: 0.02}]}
+cleanup: [{adapter: flagd, operation: restore_snapshot}]
+budgets: {max_duration_seconds: 600, max_read_tool_calls: 24, max_model_tokens: 60000}

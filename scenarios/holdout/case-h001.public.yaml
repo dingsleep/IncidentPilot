@@ -1,0 +1,4 @@
+schema_version: 1
+case_id: case-h001
+alert: {title: Notification processing resources exceed baseline, severity: P2, service_hint: email, labels: {alertname: NotificationResourcePressure}}
+budgets: {max_duration_seconds: 600, max_read_tool_calls: 24, max_model_tokens: 60000}

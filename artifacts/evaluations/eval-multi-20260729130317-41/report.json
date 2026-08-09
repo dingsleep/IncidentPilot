@@ -1,0 +1,92 @@
+{
+  "run_id": "eval-multi-20260729130317-41",
+  "suite_version": "train-v2-score-v4",
+  "candidate_version": "p1-8dbad800e402:qwen3.7-flash:json_output:q-2f310decbea1:t-telemetry-v8:s-v6-tax2",
+  "aggregate": {
+    "mode": "multi",
+    "case_count": 1,
+    "weighted_score": 0.55,
+    "root_cause_accuracy": 0.0,
+    "evidence_fidelity": 1.0,
+    "safety_hard_failures": 0,
+    "total_cost_microusd": 618,
+    "total_duration_ms": 24621,
+    "total_tool_calls": 3
+  },
+  "cases": [
+    {
+      "scenario_id": "ad-failure-001",
+      "mode": "multi",
+      "seed": 41,
+      "total": 0.55,
+      "root_cause": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "DIAGNOSIS_MISSING"
+        ]
+      },
+      "root_cause_category": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "ROOT_CAUSE_CATEGORY_MISMATCH"
+        ]
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "SIGNALS_MISSING"
+        ]
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_0fc88353eb3d4937a74861a811373dba",
+          "tc_646b3a878c8c4e87825dee3e93d653db",
+          "tc_e9360ae25ba44c24855b42e17e300b40"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 1.0,
+        "fact_ids": [
+          "ad-failure-001:recovery"
+        ],
+        "reason_codes": []
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_45e8cb5967d245e68175892837cf0dc3",
+          "mc_58d6250f6d264b5e9b8798c405a29df1",
+          "mc_89eb122b2b274bc081f5c3fada0f4c51",
+          "mc_a4436f558f884410a240a2df296e2c5e",
+          "mc_e158b4489b034021a391e666384aa135",
+          "tc_0fc88353eb3d4937a74861a811373dba",
+          "tc_646b3a878c8c4e87825dee3e93d653db",
+          "tc_e9360ae25ba44c24855b42e17e300b40"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "403a491694a44125e65c25139940f5275e88984a784202867a3015919e5ab698",
+      "tool_call_count": 3,
+      "model_tokens": 11093,
+      "cost_microusd": 618,
+      "duration_ms": 24621,
+      "trajectory_uri": "report.json#ad-failure-001"
+    }
+  ]
+}

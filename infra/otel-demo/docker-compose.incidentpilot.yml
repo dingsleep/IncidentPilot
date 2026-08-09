@@ -1,0 +1,88 @@
+services:
+  accounting:
+    image: ghcr.io/open-telemetry/demo:2.2.0-accounting
+  ad:
+    image: ghcr.io/open-telemetry/demo:2.2.0-ad
+    ports: !override []
+  cart:
+    image: ghcr.io/open-telemetry/demo:2.2.0-cart
+    ports: !override []
+  checkout:
+    image: ghcr.io/open-telemetry/demo:2.2.0-checkout
+    ports: !override []
+  currency:
+    image: ghcr.io/open-telemetry/demo:2.2.0-currency
+    ports: !override []
+  email:
+    image: ghcr.io/open-telemetry/demo:2.2.0-email
+    ports: !override []
+  flagd:
+    ports: !override []
+    networks:
+      default:
+        aliases:
+          - badhost
+  flagd-ui:
+    image: ghcr.io/open-telemetry/demo:2.2.0-flagd-ui
+    ports: !override
+      - "127.0.0.1:4000:4000"
+  fraud-detection:
+    image: ghcr.io/open-telemetry/demo:2.2.0-fraud-detection
+  frontend:
+    image: ghcr.io/open-telemetry/demo:2.2.0-frontend
+    ports: !override []
+  frontend-proxy:
+    image: ghcr.io/open-telemetry/demo:2.2.0-frontend-proxy
+    ports: !override
+      - "127.0.0.1:8080:8080"
+  grafana:
+    ports: !override
+      - "127.0.0.1:3000:3000"
+  image-provider:
+    image: ghcr.io/open-telemetry/demo:2.2.0-image-provider
+    ports: !override []
+  jaeger:
+    ports: !override
+      - "127.0.0.1:16686:16686"
+  kafka:
+    image: ghcr.io/open-telemetry/demo:2.2.0-kafka
+  llm:
+    image: ghcr.io/open-telemetry/demo:2.2.0-llm
+    ports: !override []
+  load-generator:
+    image: ghcr.io/open-telemetry/demo:2.2.0-load-generator
+    ports: !override []
+  opensearch:
+    ports: !override
+      - "127.0.0.1:9200:9200"
+  otel-collector:
+    ports: !override
+      - "127.0.0.1:4317:4317"
+      - "127.0.0.1:4318:4318"
+    volumes:
+      - ../../infra/otel-demo/otelcol-config-extras.yml:/etc/otelcol-config-extras.yml:ro
+  payment:
+    image: ghcr.io/open-telemetry/demo:2.2.0-payment
+    ports: !override []
+  postgresql:
+    ports: !override []
+  product-catalog:
+    image: ghcr.io/open-telemetry/demo:2.2.0-product-catalog
+    ports: !override []
+  product-reviews:
+    image: ghcr.io/open-telemetry/demo:2.2.0-product-reviews
+    ports: !override []
+  prometheus:
+    ports: !override
+      - "127.0.0.1:9090:9090"
+  quote:
+    image: ghcr.io/open-telemetry/demo:2.2.0-quote
+    ports: !override []
+  recommendation:
+    image: ghcr.io/open-telemetry/demo:2.2.0-recommendation
+    ports: !override []
+  shipping:
+    image: ghcr.io/open-telemetry/demo:2.2.0-shipping
+    ports: !override []
+  valkey-cart:
+    ports: !override []

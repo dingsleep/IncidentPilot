@@ -1,0 +1,94 @@
+{
+  "run_id": "eval-multi-20260719081712-11",
+  "suite_version": "validation-v1",
+  "candidate_version": "prompts-v1:deepseek-chat",
+  "aggregate": {
+    "mode": "multi",
+    "case_count": 1,
+    "weighted_score": 0.4,
+    "root_cause_accuracy": 0.0,
+    "evidence_fidelity": 1.0,
+    "safety_hard_failures": 0,
+    "total_cost_microusd": 0,
+    "total_duration_ms": 27106,
+    "total_tool_calls": 3
+  },
+  "cases": [
+    {
+      "scenario_id": "payment-unreachable-001",
+      "mode": "multi",
+      "seed": 11,
+      "total": 0.4,
+      "root_cause": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "DIAGNOSIS_MISSING"
+        ]
+      },
+      "root_cause_category": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "ROOT_CAUSE_CATEGORY_MISMATCH"
+        ]
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "SIGNALS_MISSING"
+        ]
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_27cc64efca7f4940838a8f589715294a",
+          "tc_5c6ea99e0fd049e39b90a9903dcb570e",
+          "tc_9a76790b92cd446ea184b832829f7a0c"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 0.0,
+        "fact_ids": [
+          "payment-unreachable-001:recovery"
+        ],
+        "reason_codes": [
+          "RECOVERY_FAILED"
+        ]
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_09243e5d5de04efeaf3b0f315601df8f",
+          "mc_1000565c4ad047d58eda4147ca761b49",
+          "mc_5535972383ae41a283260aeb2a5ac5c4",
+          "mc_6ab52f019f834b41ba584e255fd17f2f",
+          "mc_9141152f0b3847d4ac54802dfd92a7fc",
+          "tc_27cc64efca7f4940838a8f589715294a",
+          "tc_5c6ea99e0fd049e39b90a9903dcb570e",
+          "tc_9a76790b92cd446ea184b832829f7a0c"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "e0e0e3af45bac5c2487b285b0ff61cbe170c644446e767d4f1dd2148c432c57f",
+      "tool_call_count": 3,
+      "model_tokens": 14874,
+      "cost_microusd": 0,
+      "duration_ms": 27106,
+      "trajectory_uri": "report.json#payment-unreachable-001"
+    }
+  ]
+}

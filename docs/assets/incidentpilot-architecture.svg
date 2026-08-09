@@ -1,0 +1,145 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img" aria-labelledby="title desc">
+  <title id="title">IncidentPilot 中文系统架构图</title>
+  <desc id="desc">从真实告警和 OpenTelemetry 遥测进入有界多 Agent 调查，形成带 Evidence 的根因结论，再经过确定性安全门、人工批准、Action MCP 和恢复验证，并将轨迹送入受控进化流程。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f7fbff"/>
+      <stop offset="1" stop-color="#edf6f4"/>
+    </linearGradient>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1769e0"/>
+      <stop offset="1" stop-color="#0c9187"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#18394a" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1769e0"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#128c78"/>
+    </marker>
+    <style>
+      text { font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; fill: #153542; }
+      .eyebrow { font-size: 16px; font-weight: 800; letter-spacing: 2px; fill: #1769e0; }
+      .title { font-size: 42px; font-weight: 800; letter-spacing: -1px; }
+      .subtitle { font-size: 19px; fill: #587079; }
+      .section { font-size: 17px; font-weight: 800; fill: #1769e0; }
+      .card-title { font-size: 19px; font-weight: 800; }
+      .body { font-size: 15px; fill: #536b73; }
+      .small { font-size: 13px; fill: #667d84; }
+      .chip { font-size: 13px; font-weight: 800; }
+      .mono { font-family: Consolas, monospace; font-size: 12px; fill: #527079; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="920" rx="28" fill="url(#bg)"/>
+  <circle cx="1475" cy="70" r="180" fill="#d9f2ed" opacity="0.45"/>
+  <circle cx="70" cy="860" r="170" fill="#dcecff" opacity="0.55"/>
+
+  <text x="70" y="66" class="eyebrow">INCIDENTPILOT · AIOPS AGENT</text>
+  <text x="70" y="116" class="title">真实事故进入，带证据的处置闭环出来</text>
+  <text x="70" y="151" class="subtitle">有界多 Agent 负责调查，确定性代码负责权限与安全，所有结论均可审计</text>
+
+  <g transform="translate(1160 64)">
+    <rect width="118" height="34" rx="17" fill="#e5f1ff"/><text x="59" y="22" text-anchor="middle" class="chip" fill="#1769e0">真实遥测</text>
+    <rect x="128" width="138" height="34" rx="17" fill="#e6f7f2"/><text x="197" y="22" text-anchor="middle" class="chip" fill="#128c78">Evidence 驱动</text>
+    <rect x="276" width="96" height="34" rx="17" fill="#fff0df"/><text x="324" y="22" text-anchor="middle" class="chip" fill="#d37400">安全受控</text>
+  </g>
+
+  <!-- Input -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="210" width="250" height="350" rx="22" fill="#ffffff" stroke="#cedde3"/>
+  </g>
+  <text x="94" y="244" class="section">01 · 事故输入</text>
+  <rect x="94" y="270" width="202" height="68" rx="14" fill="#f3f8ff" stroke="#c8dcf5"/>
+  <circle cx="120" cy="304" r="11" fill="#1769e0"/>
+  <text x="143" y="298" class="card-title">告警或服务</text><text x="143" y="320" class="small">粘贴告警 · 选择服务 · 上传文本</text>
+  <rect x="94" y="352" width="202" height="84" rx="14" fill="#eef9f5" stroke="#c6e5dc"/>
+  <circle cx="120" cy="387" r="11" fill="#128c78"/>
+  <text x="143" y="381" class="card-title">真实运行环境</text><text x="143" y="403" class="small">OpenTelemetry Demo</text><text x="143" y="422" class="small">真实微服务与故障注入</text>
+  <rect x="94" y="450" width="202" height="84" rx="14" fill="#f7f9fa" stroke="#d7e1e4"/>
+  <text x="112" y="480" class="card-title">真实遥测信号</text>
+  <text x="112" y="505" class="body">Metrics · Logs · Traces</text>
+  <text x="112" y="525" class="small">只读、限域、可追溯</text>
+
+  <path d="M320 385 H370" stroke="#1769e0" stroke-width="4" marker-end="url(#arrow-blue)"/>
+
+  <!-- Agent team -->
+  <g filter="url(#shadow)"><rect x="380" y="190" width="760" height="390" rx="24" fill="#ffffff" stroke="#cbdde4"/></g>
+  <text x="408" y="226" class="section">02 · 有界 AI 事故响应团队</text>
+  <text x="908" y="226" class="small">类型化共享状态 · 固定拓扑 · 有限重试</text>
+
+  <rect x="635" y="250" width="250" height="64" rx="16" fill="url(#hero)"/>
+  <text x="760" y="278" text-anchor="middle" font-size="19" font-weight="800" fill="#ffffff">分诊 Agent</text>
+  <text x="760" y="300" text-anchor="middle" font-size="13" fill="#dfeeff">理解告警、确定影响范围</text>
+  <path d="M760 314 V344" stroke="#1769e0" stroke-width="3" marker-end="url(#arrow-blue)"/>
+
+  <rect x="407" y="353" width="166" height="92" rx="16" fill="#f2f8ff" stroke="#bcd5f5"/>
+  <circle cx="432" cy="378" r="9" fill="#1769e0"/><text x="451" y="384" class="card-title">指标 Agent</text>
+  <text x="425" y="414" class="small">Prometheus</text><text x="425" y="434" class="small">错误率 · 延迟 · SLO</text>
+
+  <rect x="588" y="353" width="166" height="92" rx="16" fill="#eef9f5" stroke="#b9dfd2"/>
+  <circle cx="613" cy="378" r="9" fill="#128c78"/><text x="632" y="384" class="card-title">日志 Agent</text>
+  <text x="606" y="414" class="small">OpenSearch</text><text x="606" y="434" class="small">错误日志 · Trace 关联</text>
+
+  <rect x="769" y="353" width="166" height="92" rx="16" fill="#f2f8ff" stroke="#bcd5f5"/>
+  <circle cx="794" cy="378" r="9" fill="#1769e0"/><text x="813" y="384" class="card-title">调用链 Agent</text>
+  <text x="787" y="414" class="small">Jaeger</text><text x="787" y="434" class="small">依赖路径 · 错误 Span</text>
+
+  <rect x="950" y="353" width="166" height="92" rx="16" fill="#eef9f5" stroke="#b9dfd2"/>
+  <circle cx="975" cy="378" r="9" fill="#128c78"/><text x="994" y="384" class="card-title">手册 Agent</text>
+  <text x="968" y="414" class="small">Runbook</text><text x="968" y="434" class="small">恢复步骤 · 风险边界</text>
+
+  <path d="M760 330 H490 V350 M760 330 H671 V350 M760 330 H852 V350 M760 330 H1033 V350" fill="none" stroke="#7daee8" stroke-width="2"/>
+  <path d="M490 445 V470 H760 M671 445 V470 M852 445 V470 M1033 445 V470 H760" fill="none" stroke="#6ab8a8" stroke-width="2"/>
+  <path d="M760 470 V488" stroke="#128c78" stroke-width="3" marker-end="url(#arrow-green)"/>
+  <rect x="600" y="495" width="320" height="62" rx="16" fill="#e9f3ff" stroke="#a9c9ef"/>
+  <text x="760" y="522" text-anchor="middle" class="card-title">事故指挥 Agent</text>
+  <text x="760" y="545" text-anchor="middle" class="small">交叉验证 Evidence，形成结构化根因结论</text>
+
+  <path d="M1140 385 H1185" stroke="#128c78" stroke-width="4" marker-end="url(#arrow-green)"/>
+
+  <!-- Result -->
+  <g filter="url(#shadow)"><rect x="1195" y="210" width="335" height="350" rx="22" fill="#ffffff" stroke="#cedde3"/></g>
+  <text x="1221" y="244" class="section">03 · 可信诊断结果</text>
+  <rect x="1221" y="270" width="283" height="104" rx="16" fill="url(#hero)"/>
+  <text x="1245" y="300" font-size="14" font-weight="800" fill="#dfeeff">最可能根因</text>
+  <text x="1245" y="334" font-size="25" font-weight="800" fill="#ffffff">服务与故障类型</text>
+  <text x="1245" y="358" font-size="13" fill="#e5f5ff">置信度 · 影响范围 · 用户影响</text>
+  <rect x="1221" y="388" width="283" height="66" rx="14" fill="#eef9f5" stroke="#b9dfd2"/>
+  <circle cx="1244" cy="421" r="8" fill="#128c78"/>
+  <text x="1262" y="416" class="card-title">可审计 Evidence</text><text x="1262" y="438" class="small">Query · Evidence ID · 时间范围</text>
+  <rect x="1221" y="467" width="283" height="66" rx="14" fill="#fff7eb" stroke="#efd3a7"/>
+  <circle cx="1244" cy="500" r="8" fill="#d57a00"/>
+  <text x="1262" y="495" class="card-title">可执行处理建议</text><text x="1262" y="517" class="small">动作、目标、风险与验证方式</text>
+
+  <!-- Safety rail -->
+  <text x="70" y="632" class="section">04 · 确定性安全处置闭环</text>
+  <rect x="70" y="654" width="1460" height="104" rx="22" fill="#ffffff" stroke="#cbdde4" filter="url(#shadow)"/>
+  <g>
+    <rect x="96" y="678" width="210" height="56" rx="14" fill="#eef4ff"/><text x="201" y="702" text-anchor="middle" class="card-title">服务端 Policy Gate</text><text x="201" y="722" text-anchor="middle" class="small">allowlist · 风险 · Evidence</text>
+    <path d="M306 706 H348" stroke="#1769e0" stroke-width="3" marker-end="url(#arrow-blue)"/>
+    <rect x="360" y="678" width="210" height="56" rx="14" fill="#fff5e8"/><text x="465" y="702" text-anchor="middle" class="card-title">人工批准</text><text x="465" y="722" text-anchor="middle" class="small">中高风险必须由人决定</text>
+    <path d="M570 706 H612" stroke="#d57a00" stroke-width="3" marker-end="url(#arrow-blue)"/>
+    <rect x="624" y="678" width="230" height="56" rx="14" fill="#f3f6f7"/><text x="739" y="702" text-anchor="middle" class="card-title">授权与幂等控制</text><text x="739" y="722" text-anchor="middle" class="small">签名 grant · scope · nonce</text>
+    <path d="M854 706 H896" stroke="#1769e0" stroke-width="3" marker-end="url(#arrow-blue)"/>
+    <rect x="908" y="678" width="210" height="56" rx="14" fill="#eef9f5"/><text x="1013" y="702" text-anchor="middle" class="card-title">独立 Action MCP</text><text x="1013" y="722" text-anchor="middle" class="small">仅允许受控 rollback</text>
+    <path d="M1118 706 H1160" stroke="#128c78" stroke-width="3" marker-end="url(#arrow-green)"/>
+    <rect x="1172" y="678" width="332" height="56" rx="14" fill="#e7f7f1"/><text x="1338" y="702" text-anchor="middle" class="card-title">Prometheus 恢复验证</text><text x="1338" y="722" text-anchor="middle" class="small">固定窗口确认 SLO，失败则补偿或转人工</text>
+  </g>
+
+  <!-- Evolution -->
+  <text x="70" y="812" class="section">05 · 受控进化（离线）</text>
+  <path d="M1504 735 V798 H325" fill="none" stroke="#8a78c8" stroke-width="2" stroke-dasharray="7 7" marker-end="url(#arrow-blue)"/>
+  <rect x="70" y="828" width="1460" height="62" rx="18" fill="#f4f0fc" stroke="#d3c9ec"/>
+  <text x="102" y="854" class="card-title">失败轨迹聚类</text><text x="102" y="875" class="small">只读、脱敏、可追溯</text>
+  <text x="346" y="863" font-size="25" fill="#917fc6">→</text>
+  <text x="395" y="854" class="card-title">生成改进候选</text><text x="395" y="875" class="small">Prompt / Tool / Runbook 草稿</text>
+  <text x="650" y="863" font-size="25" fill="#917fc6">→</text>
+  <text x="700" y="854" class="card-title">训练集与验证集回归</text><text x="700" y="875" class="small">三 seed · 硬安全指标</text>
+  <text x="990" y="863" font-size="25" fill="#917fc6">→</text>
+  <text x="1040" y="854" class="card-title">确定性晋级门禁</text><text x="1040" y="875" class="small">退化即拒绝，不由 LLM 决定</text>
+  <rect x="1325" y="842" width="168" height="34" rx="17" fill="#ffffff" stroke="#beafdF"/>
+  <text x="1409" y="864" text-anchor="middle" class="chip" fill="#7355b3">人工批准后才生效</text>
+</svg>

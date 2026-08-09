@@ -1,0 +1,42 @@
+schema_version: 1
+templates:
+  - id: service_request_rate
+    expression: >-
+      sum(rate(traces_span_metrics_calls_total{service_name="${service}"}[${window}]))
+    unit: requests_per_second
+    parameters: [service, window]
+  - id: service_error_ratio
+    expression: >-
+      sum(rate(traces_span_metrics_calls_total{service_name="${service}",status_code="STATUS_CODE_ERROR"}[${window}]))
+      /
+      clamp_min(sum(rate(traces_span_metrics_calls_total{service_name="${service}"}[${window}])), 0.000000001)
+    unit: ratio
+    parameters: [service, window]
+  - id: service_latency_p95
+    expression: >-
+      histogram_quantile(${percentile},
+      sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name="${service}"}[${window}])))
+    unit: milliseconds
+    parameters: [service, window, percentile]
+  - id: process_cpu_usage
+    expression: >-
+      avg_over_time(process_cpu_utilization_ratio{service_name="${service}"}[${duration}])
+    unit: ratio
+    parameters: [service, duration]
+  - id: process_memory_usage
+    expression: >-
+      avg_over_time(process_memory_usage_bytes{service_name="${service}"}[${duration}])
+    unit: bytes
+    parameters: [service, duration]
+  - id: container_memory_usage
+    expression: >-
+      max_over_time(container_memory_usage_total_bytes{container_name="${service}"}[${duration}])
+    unit: bytes
+    parameters: [service, duration]
+  - id: dependency_error_ratio
+    expression: >-
+      sum(rate(traces_span_metrics_calls_total{service_name="${service}",span_kind="SPAN_KIND_CLIENT",status_code="STATUS_CODE_ERROR"}[${window}]))
+      /
+      clamp_min(sum(rate(traces_span_metrics_calls_total{service_name="${service}",span_kind="SPAN_KIND_CLIENT"}[${window}])), 0.000000001)
+    unit: ratio
+    parameters: [service, window]

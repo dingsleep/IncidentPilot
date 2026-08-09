@@ -1,0 +1,12 @@
+# IncidentPilot overlay for the OpenTelemetry Demo collector.
+# The active local Demo already receives OTLP traces and metrics on 4318 and exports
+# metrics to Prometheus. Keep this connector configuration aligned with
+# infra/otel-demo/otelcol-config-extras.yml when upgrading the Demo image.
+connectors:
+  spanmetrics:
+    metrics_flush_interval: 15s
+    resource_metrics_key_attributes:
+      - service.name
+      - telemetry.sdk.language
+      - telemetry.sdk.name
+

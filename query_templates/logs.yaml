@@ -1,0 +1,14 @@
+schema_version: 1
+templates:
+  - id: service_logs
+    index: otel-logs-*
+    parameters: [services, severities, start, end, query_terms, trace_id, limit]
+    max_results: 200
+  - id: trace_logs
+    index: otel-logs-*
+    parameters: [services, start, end, trace_id, limit]
+    max_results: 200
+  - id: error_patterns
+    index: otel-logs-*
+    parameters: [services, severities, start, end, query_terms, limit]
+    max_results: 20

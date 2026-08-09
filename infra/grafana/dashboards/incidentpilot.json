@@ -1,0 +1,83 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"unit": "ms"}},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+      "id": 1,
+      "targets": [{"expr": "histogram_quantile(0.95, sum(rate(incidentpilot_agent_duration_milliseconds_bucket[5m])) by (le, agent_name))", "legendFormat": "{{agent_name}}"}],
+      "title": "Agent p95 latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"unit": "ms"}},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+      "id": 2,
+      "targets": [{"expr": "histogram_quantile(0.95, sum(rate(incidentpilot_tool_duration_milliseconds_bucket[5m])) by (le, tool_name))", "legendFormat": "{{tool_name}}"}],
+      "title": "Tool p95 latency",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+      "id": 3,
+      "targets": [{"expr": "sum(rate(incidentpilot_tool_calls_total{success=\"false\"}[5m])) / clamp_min(sum(rate(incidentpilot_tool_calls_total[5m])), 1)", "legendFormat": "tool error rate"}],
+      "title": "Tool error rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8},
+      "id": 4,
+      "targets": [{"expr": "sum(rate(incidentpilot_model_tokens_total[5m])) by (token_type, gen_ai_request_model)", "legendFormat": "{{gen_ai_request_model}} {{token_type}}"}],
+      "title": "Model token rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"unit": "currencyUSD"}},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8},
+      "id": 5,
+      "targets": [{"expr": "sum(increase(incidentpilot_model_cost_usd_total[24h])) by (gen_ai_request_model)", "legendFormat": "{{gen_ai_request_model}}"}],
+      "title": "Model cost (24h)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"unit": "percentunit"}},
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8},
+      "id": 6,
+      "targets": [{"expr": "sum(rate(incidentpilot_recovery_outcomes_total{recovered=\"true\"}[15m])) / clamp_min(sum(rate(incidentpilot_recovery_outcomes_total[15m])), 1)", "legendFormat": "recovery rate"}],
+      "title": "Recovery rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"unit": "ms"}},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16},
+      "id": 7,
+      "targets": [{"expr": "histogram_quantile(0.95, sum(rate(incidentpilot_approval_wait_milliseconds_bucket[15m])) by (le, decision))", "legendFormat": "{{decision}}"}],
+      "title": "Approval waiting p95",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"unit": "ms"}},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16},
+      "id": 8,
+      "targets": [{"expr": "histogram_quantile(0.95, sum(rate(traces_spanmetrics_latency_milliseconds_bucket{service_name=~\"incidentpilot-.*\"}[5m])) by (le, service_name))", "legendFormat": "{{service_name}}"}],
+      "title": "Incident service p95 duration",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 41,
+  "tags": ["incidentpilot", "aiops"],
+  "templating": {"list": [{"name": "DS_PROMETHEUS", "type": "datasource", "query": "prometheus", "current": {}}]},
+  "time": {"from": "now-1h", "to": "now"},
+  "title": "IncidentPilot Operations",
+  "uid": "incidentpilot-operations",
+  "version": 1
+}

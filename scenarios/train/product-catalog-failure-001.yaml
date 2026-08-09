@@ -1,0 +1,14 @@
+schema_version: 1
+id: product-catalog-failure-001
+family: product-catalog-failure
+split: train
+environment: otel-demo-compose
+control_type: fault
+alert: {title: Product detail requests are failing, severity: P2, service_hint: product-catalog, labels: {alertname: ProductCatalogErrors}}
+injections: [{adapter: flagd, operation: enable, service: product-catalog, scenario_key: productCatalogFailure, variant: "on", warmup_seconds: 30}]
+traffic: {adapter: otel-demo-http, operation: product_detail, requests: 2}
+ground_truth: {root_cause_service: product-catalog, category: application_failure, required_signal_kinds: [metric, trace]}
+allowed_actions: [rollback_change]
+recovery: {observation_seconds: 30, checks: [{template_id: service_error_ratio, service: product-catalog, comparator: lt, threshold: 0.02}]}
+cleanup: [{adapter: flagd, operation: restore_snapshot}]
+budgets: {max_duration_seconds: 600, max_read_tool_calls: 24, max_model_tokens: 60000}

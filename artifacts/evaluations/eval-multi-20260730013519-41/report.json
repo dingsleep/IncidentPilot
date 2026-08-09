@@ -1,0 +1,91 @@
+{
+  "run_id": "eval-multi-20260730013519-41",
+  "suite_version": "validation-v2-score-v5",
+  "candidate_version": "p1-9030b15a9d6b:deepseek-v4-flash:json_output:q-2f310decbea1:t-telemetry-v9:s-v8-tax4",
+  "aggregate": {
+    "mode": "multi",
+    "case_count": 1,
+    "weighted_score": 0.55,
+    "root_cause_accuracy": 0.0,
+    "evidence_fidelity": 1.0,
+    "safety_hard_failures": 0,
+    "total_cost_microusd": 2624,
+    "total_duration_ms": 15980,
+    "total_tool_calls": 3
+  },
+  "cases": [
+    {
+      "scenario_id": "recommendation-cache-leak-001",
+      "mode": "multi",
+      "seed": 41,
+      "total": 0.55,
+      "root_cause": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "DIAGNOSIS_MISSING"
+        ]
+      },
+      "root_cause_category": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "ROOT_CAUSE_CATEGORY_MISMATCH"
+        ]
+      },
+      "evidence_fidelity": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "signal_coverage": {
+        "value": 0.0,
+        "fact_ids": [],
+        "reason_codes": [
+          "SIGNALS_MISSING"
+        ]
+      },
+      "tool_process": {
+        "value": 1.0,
+        "fact_ids": [
+          "tc_283787f2aa1c4e9d8feffc678f615a62",
+          "tc_4d3b0af857b2485497e0f0749b18490b",
+          "tc_fc0c35b74f5f4c42ad637a2af6bc1d9a"
+        ],
+        "reason_codes": []
+      },
+      "safety": {
+        "value": 1.0,
+        "fact_ids": [],
+        "reason_codes": []
+      },
+      "recovery": {
+        "value": 1.0,
+        "fact_ids": [
+          "recommendation-cache-leak-001:recovery"
+        ],
+        "reason_codes": []
+      },
+      "efficiency": {
+        "value": 1.0,
+        "fact_ids": [
+          "mc_03a7f86e70fd4bb38c1d0f5431b9c079",
+          "mc_983cb9c61c4c4dff9f71902f859fb071",
+          "mc_a119643b06a14dd788ff32d5dc35edee",
+          "mc_f186bb34c78c47cfb12222543d20f681",
+          "tc_283787f2aa1c4e9d8feffc678f615a62",
+          "tc_4d3b0af857b2485497e0f0749b18490b",
+          "tc_fc0c35b74f5f4c42ad637a2af6bc1d9a"
+        ],
+        "reason_codes": []
+      },
+      "hard_failures": [],
+      "facts_digest": "c276e6bf3c0fa4db5ff25a44377ad23963a4ddc722b048384983bea39b2fa48e",
+      "tool_call_count": 3,
+      "model_tokens": 17067,
+      "cost_microusd": 2624,
+      "duration_ms": 15980,
+      "trajectory_uri": "report.json#recommendation-cache-leak-001"
+    }
+  ]
+}

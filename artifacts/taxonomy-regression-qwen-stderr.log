@@ -1,0 +1,54 @@
+Traceback (most recent call last):
+  File "E:\IncidentPilot\src\incidentpilot\llm\gateway.py", line 92, in invoke
+    raw = await self._transport.invoke(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\IncidentPilot\src\incidentpilot\llm\gateway.py", line 272, in invoke
+    response = await self._client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\ana\envs\tx_agent\Lib\site-packages\openai\resources\chat\completions\completions.py", line 2877, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+  File "D:\software\ana\envs\tx_agent\Lib\site-packages\openai\_base_client.py", line 1931, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\ana\envs\tx_agent\Lib\site-packages\openai\_base_client.py", line 1716, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.AuthenticationError: Error code: 401 - {'error': {'message': 'Authentication Fails, Your api key: ****d0Jg is invalid', 'type': 'authentication_error', 'param': None, 'code': 'invalid_request_error'}}
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\IncidentPilot\scripts\run_eval.py", line 6, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "E:\IncidentPilot\src\incidentpilot\evaluation\cli.py", line 143, in main
+    return run_evaluation(
+           ^^^^^^^^^^^^^^^
+  File "E:\IncidentPilot\src\incidentpilot\evaluation\cli.py", line 190, in run_evaluation
+    case = _run_episode(
+           ^^^^^^^^^^^^^
+  File "E:\IncidentPilot\src\incidentpilot\evaluation\cli.py", line 271, in _run_episode
+    result = runner.run(episode, seed=seed)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\IncidentPilot\src\incidentpilot\evaluation\runner.py", line 138, in run
+    raise episode_error
+  File "E:\IncidentPilot\src\incidentpilot\evaluation\runner.py", line 120, in run
+    agent_output = self._run_agent(episode.public_input, seed)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\IncidentPilot\src\incidentpilot\evaluation\cli.py", line 243, in run_agent
+    asyncio.run(
+  File "D:\software\ana\envs\tx_agent\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "D:\software\ana\envs\tx_agent\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\software\ana\envs\tx_agent\Lib\asyncio\base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "E:\IncidentPilot\src\incidentpilot\evaluation\cli.py", line 492, in _diagnose
+    report = await gateway.invoke(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\IncidentPilot\src\incidentpilot\llm\gateway.py", line 145, in invoke
+    raise ModelProviderError("model provider call failed") from exc
+incidentpilot.llm.gateway.ModelProviderError: model provider call failed

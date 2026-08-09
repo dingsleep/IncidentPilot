@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://incidentpilot.local/schemas/episode-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "family", "split", "environment", "control_type", "alert", "injections", "allowed_actions", "recovery", "cleanup", "budgets"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-001$"},
+    "family": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "split": {"enum": ["train", "validation"]},
+    "environment": {"const": "otel-demo-compose"},
+    "control_type": {"enum": ["fault", "no_fault", "distractor"]},
+    "alert": {"$ref": "#/$defs/alert"},
+    "injections": {"type": "array", "maxItems": 2, "items": {"$ref": "#/$defs/injection"}},
+    "traffic": {"$ref": "#/$defs/traffic"},
+    "ground_truth": {"$ref": "#/$defs/groundTruth"},
+    "expected_abstention": {"type": "boolean"},
+    "allowed_actions": {"type": "array", "uniqueItems": true, "maxItems": 2, "items": {"enum": ["restart_service", "rollback_change"]}},
+    "recovery": {"$ref": "#/$defs/recovery"},
+    "cleanup": {"type": "array", "maxItems": 2, "items": {"$ref": "#/$defs/cleanup"}},
+    "budgets": {"$ref": "#/$defs/budgets"}
+  },
+  "allOf": [
+    {"if": {"properties": {"control_type": {"const": "fault"}}}, "then": {"required": ["ground_truth"], "properties": {"injections": {"minItems": 1, "maxItems": 1}, "cleanup": {"minItems": 1}}, "not": {"required": ["expected_abstention"]}}},
+    {"if": {"properties": {"control_type": {"const": "distractor"}}}, "then": {"required": ["ground_truth"], "properties": {"injections": {"minItems": 2, "maxItems": 2}, "cleanup": {"minItems": 1}}, "not": {"required": ["expected_abstention"]}}},
+    {"if": {"properties": {"control_type": {"const": "no_fault"}}}, "then": {"required": ["expected_abstention"], "properties": {"injections": {"maxItems": 0}, "cleanup": {"maxItems": 0}, "expected_abstention": {"const": true}}, "not": {"required": ["ground_truth"]}}}
+  ],
+  "$defs": {
+    "alert": {"type": "object", "additionalProperties": false, "required": ["title", "severity", "service_hint", "labels"], "properties": {"title": {"type": "string", "minLength": 1, "maxLength": 500}, "description": {"type": "string", "maxLength": 4000}, "severity": {"enum": ["P1", "P2", "P3", "P4"]}, "service_hint": {"type": ["string", "null"], "maxLength": 100}, "labels": {"type": "object", "additionalProperties": {"type": "string"}}}},
+    "budgets": {"type": "object", "additionalProperties": false, "required": ["max_duration_seconds", "max_read_tool_calls", "max_model_tokens"], "properties": {"max_duration_seconds": {"type": "integer", "minimum": 60, "maximum": 3600}, "max_read_tool_calls": {"type": "integer", "minimum": 1, "maximum": 24}, "max_model_tokens": {"type": "integer", "minimum": 1000, "maximum": 200000}}},
+    "injection": {"type": "object", "additionalProperties": false, "required": ["adapter", "operation", "service", "scenario_key", "variant", "warmup_seconds"], "properties": {"adapter": {"const": "flagd"}, "operation": {"const": "enable"}, "service": {"type": "string", "minLength": 1}, "scenario_key": {"type": "string", "minLength": 1}, "variant": {"type": "string", "minLength": 1}, "warmup_seconds": {"type": "integer", "minimum": 0, "maximum": 600}}},
+    "traffic": {"type": "object", "additionalProperties": false, "required": ["adapter", "operation", "requests"], "properties": {"adapter": {"const": "otel-demo-http"}, "operation": {"enum": ["ads", "ai_assistant", "checkout", "cart", "product_detail", "recommendations"]}, "requests": {"type": "integer", "minimum": 1, "maximum": 60}}},
+    "groundTruth": {"type": "object", "additionalProperties": false, "required": ["root_cause_service", "category", "required_signal_kinds"], "properties": {"root_cause_service": {"type": "string", "minLength": 1}, "dependency_service": {"type": "string", "minLength": 1}, "category": {"type": "string", "minLength": 1}, "required_signal_kinds": {"type": "array", "minItems": 1, "maxItems": 3, "uniqueItems": true, "items": {"enum": ["metric", "log", "trace"]}}}},
+    "recovery": {"type": "object", "additionalProperties": false, "required": ["observation_seconds", "checks"], "properties": {"observation_seconds": {"type": "integer", "minimum": 30, "maximum": 900}, "checks": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"type": "object", "additionalProperties": false, "required": ["template_id", "service", "comparator", "threshold"], "properties": {"template_id": {"type": "string", "minLength": 1}, "service": {"type": "string", "minLength": 1}, "comparator": {"enum": ["lt", "lte", "gt", "gte", "between"]}, "threshold": {"oneOf": [{"type": "number"}, {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}]}}}}}},
+    "cleanup": {"type": "object", "additionalProperties": false, "required": ["adapter", "operation"], "properties": {"adapter": {"const": "flagd"}, "operation": {"const": "restore_snapshot"}}}
+  }
+}

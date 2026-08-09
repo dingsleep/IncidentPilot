@@ -1,0 +1,13 @@
+schema_version: 1
+id: no-fault-control-001
+family: no-fault-control
+split: validation
+environment: otel-demo-compose
+control_type: no_fault
+alert: {title: Storefront latency signal requires confirmation, severity: P3, service_hint: frontend, labels: {alertname: StorefrontSignalReview}}
+injections: []
+expected_abstention: true
+allowed_actions: []
+recovery: {observation_seconds: 30, checks: [{template_id: service_error_ratio, service: frontend, comparator: lt, threshold: 0.02}]}
+cleanup: []
+budgets: {max_duration_seconds: 600, max_read_tool_calls: 24, max_model_tokens: 60000}

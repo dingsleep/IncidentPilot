@@ -1,0 +1,14 @@
+schema_version: 1
+id: llm-rate-limit-001
+family: llm-rate-limit
+split: train
+environment: otel-demo-compose
+control_type: fault
+alert: {title: Product review assistant requests are rate limited, severity: P2, service_hint: product-reviews, labels: {alertname: ProductReviewRateLimit}}
+injections: [{adapter: flagd, operation: enable, service: product-reviews, scenario_key: llmRateLimitError, variant: "on", warmup_seconds: 30}]
+traffic: {adapter: otel-demo-http, operation: ai_assistant, requests: 10}
+ground_truth: {root_cause_service: product-reviews, dependency_service: llm, category: upstream_rate_limit, required_signal_kinds: [log, trace]}
+allowed_actions: [rollback_change]
+recovery: {observation_seconds: 30, checks: [{template_id: service_error_ratio, service: product-reviews, comparator: lt, threshold: 0.02}]}
+cleanup: [{adapter: flagd, operation: restore_snapshot}]
+budgets: {max_duration_seconds: 600, max_read_tool_calls: 24, max_model_tokens: 60000}

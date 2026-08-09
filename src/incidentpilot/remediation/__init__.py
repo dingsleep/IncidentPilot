@@ -1,0 +1,1 @@
+"""Deterministic remediation safety primitives."""
